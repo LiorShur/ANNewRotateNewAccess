@@ -1264,6 +1264,7 @@
         </div>
 
         <form class="form-container" id="accessibilityForm">
+          <button type="button" onclick="closeAccessibilityForm()">🚪 סגור</button>
             <!-- Basic Trail Information -->
             <div class="section">
                 <div class="section-header" onclick="toggleSection(this)">
@@ -1880,7 +1881,9 @@
             </div>
 
             <div class="submit-section">
-                <button type="submit" class="submit-btn">🌿 Submit Trail Survey</button>
+              <button type="submit" class="submit-btn">✔️ שמור</button>
+      <button type="button" onclick="closeAccessibilityForm()">❌ ביטול</button>
+<!--                 <button type="submit" class="submit-btn">🌿 Submit Trail Survey</button> -->
                 <p style="color: white; margin-top: 15px; opacity: 0.9;">Thank you for helping make nature accessible to everyone!</p>
             </div>
         </form>
