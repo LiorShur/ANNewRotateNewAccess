@@ -815,6 +815,280 @@
       }
     }
   </style>
+      <style>
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-left: 5px solid #4a7c59;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+
+        .section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+            color: white;
+            padding: 20px 25px;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.3s ease;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header:hover {
+            background: linear-gradient(135deg, #1e3d21 0%, #3a6547 100%);
+        }
+
+        .section-header h2 {
+            color: white;
+            font-size: 1.8rem;
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+
+        .toggle-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .toggle-icon.rotated {
+            transform: rotate(180deg);
+        }
+
+        .section-content {
+            padding: 25px;
+            display: none;
+        }
+
+        .section-content.active {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c5530;
+            font-size: 1rem;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="tel"],
+        input[type="email"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: white;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            border-color: #4a7c59;
+            box-shadow: 0 0 0 3px rgba(74, 124, 89, 0.1);
+            outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .checkbox-group,
+        .radio-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .checkbox-item,
+        .radio-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .checkbox-item:hover,
+        .radio-item:hover {
+            border-color: #4a7c59;
+            background: #f8f9fa;
+        }
+
+        .checkbox-item input,
+        .radio-item input {
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .rating-scale {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 15px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+        }
+
+        .rating-scale input[type="radio"] {
+            margin: 0 5px;
+            transform: scale(1.3);
+        }
+
+        .rating-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .submit-section {
+            text-align: center;
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #2c5530 0%, #4a7c59 100%);
+            border-radius: 15px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(40, 167, 69, 0.4);
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .info-text {
+            font-size: 0.9rem;
+            color: #666;
+            font-style: italic;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .checkbox-group,
+            .radio-group {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+        }
+
+        .accessibility-icons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .icon {
+            font-size: 3rem;
+            opacity: 0.7;
+        }
+    </style>
 </head>
 <body>
 
@@ -976,8 +1250,641 @@
 
 <!-- Accessibility Form -->
 <div id="accessibilityOverlay" style="display:none;">
-  <div id="accessibilityFormContainer">
-    <h2>🧭 טופס נגישות</h2>
+  <div id="accessibilityFormContainer" class="container">
+    <div class="header">
+            <h1>🌲 Nature Trail Accessibility Survey</h1>
+            <p>Help others discover accessible outdoor experiences</p>
+            <div class="accessibility-icons">
+                <span class="icon">♿</span>
+                <span class="icon">🦯</span>
+                <span class="icon">🦻</span>
+                <span class="icon">👁️</span>
+                <span class="icon">🧠</span>
+            </div>
+        </div>
+
+        <form class="form-container" id="accessibilityForm">
+            <!-- Basic Trail Information -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🗺️ Basic Trail Information</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content active">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="trailName">Trail Name <span class="required">*</span></label>
+                        <input type="text" id="trailName" name="trailName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="location">Location/Address <span class="required">*</span></label>
+                        <input type="text" id="location" name="location" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="trailLength">Trail Length (miles/km)</label>
+                        <input type="number" id="trailLength" name="trailLength" step="0.1" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="estimatedTime">Estimated Duration</label>
+                        <select id="estimatedTime" name="estimatedTime">
+                            <option value="">Select duration</option>
+                            <option value="under-30">Under 30 minutes</option>
+                            <option value="30-60">30-60 minutes</option>
+                            <option value="1-2-hours">1-2 hours</option>
+                            <option value="2-4-hours">2-4 hours</option>
+                            <option value="half-day">Half day</option>
+                            <option value="full-day">Full day</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="trailType">Trail Type</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="loop" name="trailType" value="loop">
+                            <label for="loop">Loop Trail</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="outBack" name="trailType" value="out-back">
+                            <label for="outBack">Out and Back</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="pointToPoint" name="trailType" value="point-to-point">
+                            <label for="pointToPoint">Point to Point</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="boardwalk" name="trailType" value="boardwalk">
+                            <label for="boardwalk">Boardwalk</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Path Surface & Terrain -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🛤️ Path Surface & Terrain</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                
+                <div class="form-group">
+                    <label>Primary Surface Type <span class="required">*</span></label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="paved" name="surfaceType" value="paved" required>
+                            <label for="paved">Paved/Asphalt</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="concrete" name="surfaceType" value="concrete" required>
+                            <label for="concrete">Concrete</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="gravel" name="surfaceType" value="gravel" required>
+                            <label for="gravel">Gravel/Stone</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="dirt" name="surfaceType" value="dirt" required>
+                            <label for="dirt">Dirt/Soil</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="wood" name="surfaceType" value="wood" required>
+                            <label for="wood">Wood/Boardwalk</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="mixed" name="surfaceType" value="mixed" required>
+                            <label for="mixed">Mixed Surfaces</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="pathWidth">Path Width (feet/meters)</label>
+                        <input type="number" id="pathWidth" name="pathWidth" step="0.5" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="surfaceCondition">Surface Condition</label>
+                        <select id="surfaceCondition" name="surfaceCondition">
+                            <option value="">Select condition</option>
+                            <option value="excellent">Excellent - Smooth, well-maintained</option>
+                            <option value="good">Good - Minor irregularities</option>
+                            <option value="fair">Fair - Some bumps, cracks, or loose material</option>
+                            <option value="poor">Poor - Significant obstacles or damage</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Trail Difficulty Rating</label>
+                    <div class="rating-scale">
+                        <span>Easy</span>
+                        <input type="radio" name="difficulty" value="1">
+                        <input type="radio" name="difficulty" value="2">
+                        <input type="radio" name="difficulty" value="3">
+                        <input type="radio" name="difficulty" value="4">
+                        <input type="radio" name="difficulty" value="5">
+                        <span>Challenging</span>
+                    </div>
+                    <div class="rating-labels">
+                        <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gradient & Elevation -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>⛰️ Gradient & Elevation</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="maxGrade">Maximum Grade/Slope (%)</label>
+                        <input type="number" id="maxGrade" name="maxGrade" step="0.5" min="0" max="100">
+                        <div class="info-text">0% = flat, 5% = gentle slope, 10%+ = steep</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="avgGrade">Average Grade/Slope (%)</label>
+                        <input type="number" id="avgGrade" name="avgGrade" step="0.5" min="0" max="100">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="elevationGain">Total Elevation Gain (feet/meters)</label>
+                        <input type="number" id="elevationGain" name="elevationGain" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="steepSections">Number of Steep Sections</label>
+                        <input type="number" id="steepSections" name="steepSections" min="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Terrain Features</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="stairs" name="terrainFeatures" value="stairs">
+                            <label for="stairs">Stairs/Steps</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="bridges" name="terrainFeatures" value="bridges">
+                            <label for="bridges">Bridges</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="ramps" name="terrainFeatures" value="ramps">
+                            <label for="ramps">Ramps</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="roots" name="terrainFeatures" value="roots">
+                            <label for="roots">Tree Roots</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="rocks" name="terrainFeatures" value="rocks">
+                            <label for="rocks">Rocks/Boulders</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="water" name="terrainFeatures" value="water">
+                            <label for="water">Water Crossings</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mobility Accessibility -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>♿ Mobility Accessibility</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                
+                <div class="form-group">
+                    <label>Wheelchair Accessibility Level</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="wheelchairFull" name="wheelchairAccess" value="fully-accessible">
+                            <label for="wheelchairFull">Fully Accessible</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="wheelchairPartial" name="wheelchairAccess" value="partially-accessible">
+                            <label for="wheelchairPartial">Partially Accessible</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="wheelchairAssist" name="wheelchairAccess" value="assistance-needed">
+                            <label for="wheelchairAssist">Accessible with Assistance</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="wheelchairNot" name="wheelchairAccess" value="not-accessible">
+                            <label for="wheelchairNot">Not Accessible</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Mobility Aid Suitability</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="manualWheelchair" name="mobilityAids" value="manual-wheelchair">
+                            <label for="manualWheelchair">Manual Wheelchair</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="powerWheelchair" name="mobilityAids" value="power-wheelchair">
+                            <label for="powerWheelchair">Power Wheelchair</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="scooter" name="mobilityAids" value="mobility-scooter">
+                            <label for="scooter">Mobility Scooter</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="walker" name="mobilityAids" value="walker">
+                            <label for="walker">Walker</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="crutches" name="mobilityAids" value="crutches">
+                            <label for="crutches">Crutches</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cane" name="mobilityAids" value="cane">
+                            <label for="cane">Walking Cane</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="restAreas">Number of Rest Areas/Benches</label>
+                        <input type="number" id="restAreas" name="restAreas" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="restInterval">Distance Between Rest Areas (feet/meters)</label>
+                        <input type="number" id="restInterval" name="restInterval" min="0">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visual Accessibility -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>👁️ Visual Accessibility</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                
+                <div class="form-group">
+                    <label>Visual Navigation Features</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="tactileMarkers" name="visualFeatures" value="tactile-markers">
+                            <label for="tactileMarkers">Tactile Path Markers</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="brailleSignage" name="visualFeatures" value="braille-signage">
+                            <label for="brailleSignage">Braille Signage</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="largeTextSigns" name="visualFeatures" value="large-text">
+                            <label for="largeTextSigns">Large Text Signs</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="audioGuides" name="visualFeatures" value="audio-guides">
+                            <label for="audioGuides">Audio Guides Available</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="highContrast" name="visualFeatures" value="high-contrast">
+                            <label for="highContrast">High Contrast Signage</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="pathEdging" name="visualFeatures" value="path-edging">
+                            <label for="pathEdging">Clear Path Edging</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Lighting Conditions</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="wellLit" name="lighting" value="well-lit">
+                            <label for="wellLit">Well Lit</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="partiallyLit" name="lighting" value="partially-lit">
+                            <label for="partiallyLit">Partially Lit</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="naturalLight" name="lighting" value="natural-only">
+                            <label for="naturalLight">Natural Light Only</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="dimLighting" name="lighting" value="dim">
+                            <label for="dimLighting">Dim/Shaded</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="hazards">Visual Hazards Present</label>
+                        <select id="hazards" name="hazards">
+                            <option value="none">None</option>
+                            <option value="low-branches">Low Hanging Branches</option>
+                            <option value="uneven-surface">Uneven Surfaces</option>
+                            <option value="water-hazards">Water Hazards</option>
+                            <option value="cliff-edges">Cliff Edges/Drop-offs</option>
+                            <option value="multiple">Multiple Hazards</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="guideDogFriendly">Guide Dog Friendly?</label>
+                        <select id="guideDogFriendly" name="guideDogFriendly">
+                            <option value="">Select option</option>
+                            <option value="yes">Yes</option>
+                            <option value="yes-with-caution">Yes, with caution</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hearing Accessibility -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🦻 Hearing Accessibility</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                
+                <div class="form-group">
+                    <label>Audio Information Available</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="visualAlternatives" name="hearingFeatures" value="visual-alternatives">
+                            <label for="visualAlternatives">Visual Alternatives to Audio</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="textSigns" name="hearingFeatures" value="text-signage">
+                            <label for="textSigns">Comprehensive Text Signage</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vibrationAlerts" name="hearingFeatures" value="vibration-alerts">
+                            <label for="vibrationAlerts">Vibration Alerts (if applicable)</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="visualWarnings" name="hearingFeatures" value="visual-warnings">
+                            <label for="visualWarnings">Visual Warning Systems</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Emergency Communication</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="emergencyVisual" name="emergencyComm" value="visual-systems">
+                            <label for="emergencyVisual">Visual Emergency Systems</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="emergencyText" name="emergencyComm" value="text-based">
+                            <label for="emergencyText">Text-based Communication</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="emergencyLimited" name="emergencyComm" value="limited">
+                            <label for="emergencyLimited">Limited Options</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="emergencyNone" name="emergencyComm" value="none">
+                            <label for="emergencyNone">No Special Systems</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cognitive Accessibility -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🧠 Cognitive & Sensory Accessibility</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                
+                <div class="form-group">
+                    <label>Navigation Complexity</label>
+                    <div class="rating-scale">
+                        <span>Simple</span>
+                        <input type="radio" name="navigationComplexity" value="1">
+                        <input type="radio" name="navigationComplexity" value="2">
+                        <input type="radio" name="navigationComplexity" value="3">
+                        <input type="radio" name="navigationComplexity" value="4">
+                        <input type="radio" name="navigationComplexity" value="5">
+                        <span>Complex</span>
+                    </div>
+                    <div class="rating-labels">
+                        <span>Very Easy</span><span>Easy</span><span>Moderate</span><span>Difficult</span><span>Very Difficult</span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Cognitive Support Features</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="clearSignage" name="cognitiveFeatures" value="clear-signage">
+                            <label for="clearSignage">Clear, Simple Signage</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mapMarkers" name="cognitiveFeatures" value="map-markers">
+                            <label for="mapMarkers">Regular Map/Direction Markers</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="colorCoding" name="cognitiveFeatures" value="color-coding">
+                            <label for="colorCoding">Color-coded Trail System</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="landmarkGuides" name="cognitiveFeatures" value="landmark-guides">
+                            <label for="landmarkGuides">Clear Landmark References</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="quietZones" name="cognitiveFeatures" value="quiet-zones">
+                            <label for="quietZones">Quiet/Low Stimulation Areas</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="sensoryBreaks" name="cognitiveFeatures" value="sensory-breaks">
+                            <label for="sensoryBreaks">Sensory Break Areas</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="noiseLevel">Typical Noise Level</label>
+                        <select id="noiseLevel" name="noiseLevel">
+                            <option value="">Select level</option>
+                            <option value="very-quiet">Very Quiet</option>
+                            <option value="quiet">Quiet</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="noisy">Noisy</option>
+                            <option value="very-noisy">Very Noisy</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="crowdLevel">Typical Crowd Level</label>
+                        <select id="crowdLevel" name="crowdLevel">
+                            <option value="">Select level</option>
+                            <option value="very-low">Very Low</option>
+                            <option value="low">Low</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="high">High</option>
+                            <option value="very-high">Very High</option>
+                        </select>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Facilities & Amenities -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>🏢 Facilities & Amenities</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                
+                <div class="form-group">
+                    <label>Available Facilities</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="accessibleParking" name="facilities" value="accessible-parking">
+                            <label for="accessibleParking">Accessible Parking</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="accessibleParkingSpaces">Number of Accessible Parking Spaces</label>
+                    <input type="number" id="accessibleParkingSpaces" name="accessibleParkingSpaces" min="0" placeholder="Enter number of spaces">
+                    <div class="info-text">Leave blank if no accessible parking or unknown</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Available Facilities (continued)</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="accessibleRestrooms" name="facilities" value="accessible-restrooms">
+                            <label for="accessibleRestrooms">Accessible Restrooms</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="waterFountains" name="facilities" value="water-fountains">
+                            <label for="waterFountains">Water Fountains</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="picnicAreas" name="facilities" value="picnic-areas">
+                            <label for="picnicAreas">Accessible Picnic Areas</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="shelters" name="facilities" value="shelters">
+                            <label for="shelters">Covered Shelters</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="informationCenter" name="facilities" value="info-center">
+                            <label for="informationCenter">Visitor Information Center</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="entryFee">Entry Fee Required?</label>
+                        <select id="entryFee" name="entryFee">
+                            <option value="">Select option</option>
+                            <option value="free">Free</option>
+                            <option value="fee-required">Fee Required</option>
+                            <option value="donation-suggested">Donation Suggested</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="publicTransport">Public Transportation Access</label>
+                        <select id="publicTransport" name="publicTransport">
+                            <option value="">Select option</option>
+                            <option value="excellent">Excellent</option>
+                            <option value="good">Good</option>
+                            <option value="limited">Limited</option>
+                            <option value="none">None</option>
+                        </select>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="section">
+                <div class="section-header" onclick="toggleSection(this)">
+                    <h2>📝 Additional Information</h2>
+                    <span class="toggle-icon">▼</span>
+                </div>
+                <div class="section-content">
+                
+                <div class="form-group">
+                    <label for="bestTimes">Best Times to Visit</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="earlyMorning" name="bestTimes" value="early-morning">
+                            <label for="earlyMorning">Early Morning</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="midMorning" name="bestTimes" value="mid-morning">
+                            <label for="midMorning">Mid Morning</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="afternoon" name="bestTimes" value="afternoon">
+                            <label for="afternoon">Afternoon</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="evening" name="bestTimes" value="evening">
+                            <label for="evening">Evening</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="weekdays" name="bestTimes" value="weekdays">
+                            <label for="weekdays">Weekdays</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="weekends" name="bestTimes" value="weekends">
+                            <label for="weekends">Weekends</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="additionalNotes">Additional Accessibility Notes</label>
+                    <textarea id="additionalNotes" name="additionalNotes" placeholder="Please provide any additional details about accessibility features, challenges, or recommendations that would help visitors plan their trip..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="surveyorName">Surveyor Name (Optional)</label>
+                        <input type="text" id="surveyorName" name="surveyorName">
+                    </div>
+                    <div class="form-group">
+                        <label for="surveyDate">Survey Date</label>
+                        <input type="date" id="surveyDate" name="surveyDate">
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <div class="submit-section">
+                <button type="submit" class="submit-btn">🌿 Submit Trail Survey</button>
+                <p style="color: white; margin-top: 15px; opacity: 0.9;">Thank you for helping make nature accessible to everyone!</p>
+            </div>
+        </form>
+<!--     <h2>🧭 טופס נגישות</h2>
     <form id="accessibilityForm">
       <button type="button" onclick="closeAccessibilityForm()">🚪 סגור</button>
 
@@ -1047,7 +1954,7 @@
 
       <button type="submit">✔️ שמור</button>
       <button type="button" onclick="closeAccessibilityForm()">❌ ביטול</button>
-    </form>
+    </form> -->
 <!--     <h2>🧭 Accessibility Questionnaire</h2>
     <form id="accessibilityForm">
       <button type="button" onclick="closeAccessibilityForm()">🚪 Close</button>
@@ -1367,6 +2274,56 @@ function getSmoothedHeading() {
     attachOrientationListeners();
   }
 </script>
+              <script>
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.classList.remove('rotated');
+                content.style.display = 'none';
+            } else {
+                content.classList.add('active');
+                icon.classList.add('rotated');
+                content.style.display = 'block';
+            }
+        }
+
+        // Initialize first section as open
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstSection = document.querySelector('.section-content');
+            const firstIcon = document.querySelector('.toggle-icon');
+            firstSection.style.display = 'block';
+            firstIcon.classList.add('rotated');
+        });
+
+        // Form submission handler
+        document.getElementById('accessibilityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = new FormData(this);
+            const data = {};
+            
+            // Handle regular form fields
+            for (let [key, value] of formData.entries()) {
+                if (data[key]) {
+                    if (Array.isArray(data[key])) {
+                        data[key].push(value);
+                    } else {
+                        data[key] = [data[key], value];
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            // Display collected data (in a real application, this would be sent to a server)
+            console.log('Trail Accessibility Survey Data:', data);
+            alert('Survey submitted successfully! Thank you for your contribution to making nature accessible.');
+        });
+    </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <!-- Leaflet Control Geocoder CSS + JS -->
