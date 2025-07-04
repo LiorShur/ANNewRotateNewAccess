@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv='cache-control' content='no-cache'> 
+  <meta http-equiv='expires' content='0'> 
+  <meta http-equiv='pragma' content='no-cache'>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Access Nature</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    #map, #map-container {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    #map-container {
+      width: 200%;
+      height: 200%;
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      transform-origin: center center;
+      transition: none;
+      z-index: 1;
+    }
+
+    /* TOP BAR - FIXED POSITIONING */
+    .top-bar {
+      position: fixed !important;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000 !important;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 6px 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: calc(100vw - 20px);
+      overflow: hidden;
+    }
+
+    /* FLOATING LEFT BUTTONS */
+    .floating-left {
+      position: fixed !important;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2000 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* FLOATING RIGHT BUTTONS */
+    .floating-right {
+      position: fixed !important;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2000 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* MEDIA PANEL */
+    .media-panel {
+      position: fixed !important;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 2000 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      opacity: 1;
+      pointer-events: auto;
+/*       transition: opacity 0.3s ease, transform 0.3s ease; */
+    }
+
+    .media-panel.open {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(-50%) translateX(0);
+    }
+
+    /* BOTTOM NAVIGATION */
+    .bottom-nav {
+      position: fixed !important;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2000 !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      padding: 6px 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      max-width: calc(100vw - 20px);
+      overflow-x: auto;
+      overflow-y: visible;
+    }
+
+    /* BOTTOM PANELS */
+    .bottom-popup {
+      position: fixed !important;
+      bottom: 70px;
+      left: 10px;
+      right: 10px;
+      z-index: 2000 !important;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      max-height: 50vh;
+      overflow-y: auto;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+    }
+
+    .bottom-popup.hidden {
+      display: none !important;
+    }
+
+    /* COMPASS AND DEBUG */
+    #compass {
+      position: fixed !important;
+      top: 15px;
+      right: 15px;
+      z-index: 2500 !important;
+      width: 50px;
+      height: 50px;
+      background: rgba(255,255,255,0.9);
+      border: 2px solid #333;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transform-origin: center center;
+      transition: none;
+    }
+
+    #debug {
+      position: fixed !important;
+      top: 75px;
+      right: 15px;
+      z-index: 2500 !important;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      padding: 6px;
+      font-family: monospace;
+      font-size: 10px;
+      border-radius: 4px;
+      display: none;
+      max-width: 120px;
+    }
+
+    /* ACCESSIBILITY OVERLAY */
+#accessibilityOverlay {
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3000 !important;
+  background: rgba(0, 0, 0, 0.8); /* Changed from backg and set to 80% opacity */
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+#accessibilityFormContainer {
+  position: relative;
+  background: white; /* Changed from backg */
+  color: black;
+  max-height: calc(100vh - 20px);
+  max-width: calc(100vw - 20px);
+  width: 500px;
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  padding: 16px;
+  direction: rtl;
+  text-align: right;
+}
+
+    /* ROUND BUTTONS */
+/*     .round-button {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0, 0, 0, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      z-index: inherit;
+      flex-shrink: 0;
+    } */
+
+/*     .round-button:hover {
+      background: rgba(240, 240, 240, 0.95);
+      transform: scale(1.05);
+    }
+ */
+    .round-button:active {
+      transform: scale(0.95);
+    }
+    .round-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: black;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.round-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+}
+
+.round-button svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: white;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+    /* REGULAR BUTTONS */
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      margin: 2px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      background-color: #45a049;
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      background-color: #ccc !important;
+      color: #888 !important;
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* NAVIGATION BUTTON STYLES */
+    .bottom-nav button {
+      background: #f0f0f0;
+      color: #333;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 12px;
+      min-width: auto;
+      flex-shrink: 0;
+    }
+
+    .bottom-nav button:hover {
+      background: #e0e0e0;
+    }
+
+    /* FORM STYLES */
+    #accessibilityForm {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    #accessibilityForm label {
+      display: block;
+      margin-top: 6px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    #accessibilityForm input,
+    #accessibilityForm select,
+    #accessibilityForm textarea {
+      width: 100%;
+      margin-top: 4px;
+      padding: 8px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+    }
+
+    #accessibilityForm button {
+      margin-top: 12px;
+      padding: 10px 16px;
+      font-size: 18px;
+      border-radius: 8px;
+    }
+
+    /* COMPASS NEEDLE */
+    #compass-needle {
+      width: 2px;
+      height: 30px;
+      position: relative;
+      transform-origin: center bottom;
+    }
+
+    #compass-needle::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -3px;
+      width: 0;
+      height: 0;
+      border-left: 3px solid transparent;
+      border-right: 3px solid transparent;
+      border-bottom: 15px solid #e74c3c;
+    }
+
+    #compass-needle::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -3px;
+      width: 0;
+      height: 0;
+      border-left: 3px solid transparent;
+      border-right: 3px solid transparent;
+      border-top: 15px solid #34495e;
+    }
+
+    #compass-center {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: #2c3e50;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    /* DARK MODE */
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .top-bar,
+    body.dark-mode .bottom-nav,
+    body.dark-mode .bottom-popup {
+      background: rgba(30, 30, 30, 0.95);
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .round-button {
+      background: rgba(50, 50, 50, 0.9);
+      color: #e0e0e0;
+    }
+
+    body.dark-mode button {
+      background-color: #333;
+      color: white;
+    }
+
+    body.dark-mode .bottom-nav button {
+      background: #444;
+      color: #e0e0e0;
+    }
+
+    body.dark-mode .bottom-nav button:hover {
+      background: #555;
+    }
+
+    /* TOGGLE PANEL */
+    .toggle-panel {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+      margin-top: 8px;
+    }
+
+    .toggle-panel.open {
+      max-height: 400px;
+    }
+
+    /* TIMER AND DISTANCE DISPLAY */
+    #timer, #distance {
+      font-family: monospace;
+      font-weight: bold;
+      font-size: 18px;
+      color: #333;
+      white-space: nowrap;
+    }
+
+    body.dark-mode #timer,
+    body.dark-mode #distance {
+      color: #e0e0e0;
+    }
+
+    /* HIDDEN ELEMENTS */
+    .sessions,
+    #controls,
+    #historyPanel,
+    #photoInput,
+    #videoInput,
+    #importFile,
+    #developerToolsPanel {
+      display: none !important;
+    }
+
+.storage-monitor {
+  position: fixed !important;
+  font-family: monospace;
+  top: 70px; /* 10px (top-bar top) + 44px (estimated top-bar height) + 6px (top-bar padding) + 5px (desired gap) + 5px buffer */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250px;
+  max-height: 90vh;
+  background:rgba(0,0,0,0.7);
+  border: 1px solid #999;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  padding: 10px;
+  z-index: 2100 !important; /* Higher than top-bar (2000) but lower than compass (2500) */
+  color: #fff;
+}
+
+.storage-monitor img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 3px;
+  border: 1px solid #999;
+}
+
+.storage-monitor button {
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#localStorageStatus.dragging {
+  transition: none !important;
+  cursor: move;
+}
+
+#storageHeader {
+  padding: 8px;
+  background: black;
+  color: #fff;
+  font-family: monospace;
+  font-weight: bold;
+  cursor: grab;
+  user-select: none;
+}
+
+.nav-button {
+            width: 40px;
+            height: 40px;
+            background: #000;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-button:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+        
+        .nav-button:active {
+            transform: translateY(0);
+        }
+        
+        .nav-button svg {
+            width: 28px;
+            height: 28px;
+            stroke: white;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            z-index: 1;
+        }
+        
+        .nav-button.fill-icon svg {
+            fill: white;
+            stroke: none;
+        }
+        
+        .button-label {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 11px;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .storage-monitor {
+    top: 65px; /* Adjusted for mobile top-bar positioning */
+    left: 50%;
+  
+  width: 250px;
+    transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .storage-monitor {
+    top: 60px;
+    left: 70px;
+  
+  width: 250px;
+    max-height: 70vh;
+  }
+}
+
+/* Landscape orientation adjustment */
+@media (max-height: 500px) and (orientation: landscape) {
+  .storage-monitor {
+    top: 45px; /* Adjusted for landscape top-bar positioning */
+    max-height: 60vh;
+  }
+}
+    /* MOBILE RESPONSIVE DESIGN */
+    @media (max-width: 768px) {
+      .top-bar {
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        transform: translateX(-50%);
+        transform: none;
+        gap: 6px;
+        padding: 4px 8px;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+      }
+      
+      .bottom-nav {
+        bottom: 5px;
+        left: 5px;
+        right: 5px;
+        transform: translateX(-50%);
+        transform: none;
+        gap: 4px;
+        padding: 4px 8px;
+      }
+      
+      .bottom-popup {
+        bottom: 60px;
+        left: 5px;
+        right: 5px;
+        padding: 10px;
+        max-height: 40vh;
+      }
+      
+      .floating-left {
+        left: 5px;
+        gap: 6px;
+      }
+      
+      .floating-right {
+        right: 5px;
+        gap: 6px;
+      }
+      
+      .media-panel {
+        right: 5px;
+        transform: translateY(-50%) translateX(50px);
+        gap: 6px;
+      }
+      
+      #compass {
+        top: 10px;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+      }
+      
+      #debug {
+        top: 60px;
+        right: 10px;
+        font-size: 9px;
+        padding: 4px;
+        max-width: 100px;
+      }
+      
+      #accessibilityFormContainer {
+        padding: 12px;
+        margin: 5px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .top-bar {
+        gap: 4px;
+        padding: 4px 6px;
+      }
+      
+      .round-button {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+      }
+      
+      button {
+        padding: 6px 10px;
+        font-size: 12px;
+      }
+      
+      .bottom-nav button {
+        padding: 6px 8px;
+        font-size: 11px;
+      }
+      
+      #timer, #distance {
+        font-size: 14px;
+      }
+      
+      .bottom-popup {
+        gap: 4px;
+        padding: 8px;
+      }
+      
+      #compass {
+        width: 35px;
+        height: 35px;
+      }
+      
+      #compass-needle {
+        height: 25px;
+      }
+      
+      #compass-needle::before,
+      #compass-needle::after {
+        border-width: 2px;
+      }
+      
+      #compass-needle::before {
+        border-bottom-width: 12px;
+      }
+      
+      #compass-needle::after {
+        border-top-width: 12px;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .top-bar {
+        padding: 3px 4px;
+        gap: 3px;
+      }
+      
+      .round-button {
+        width: 35px;
+        height: 35px;
+        font-size: 14px;
+      }
+      
+      button {
+        padding: 5px 8px;
+        font-size: 11px;
+      }
+      
+      .bottom-nav button {
+        padding: 5px 6px;
+        font-size: 10px;
+      }
+      
+      #timer, #distance {
+        font-size: 14px;
+      }
+      
+      .floating-left, .floating-right {
+        gap: 4px;
+      }
+      
+      .media-panel {
+        gap: 4px;
+      }
+    }
+
+    /* LANDSCAPE ORIENTATION */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .top-bar {
+        top: 3px;
+        padding: 2px 6px;
+      }
+      
+      .bottom-nav {
+        bottom: 3px;
+        padding: 2px 6px;
+      }
+      
+      .bottom-popup {
+        bottom: 40px;
+        max-height: 30vh;
+      }
+      
+      .floating-left, .floating-right {
+        top: 40%;
+        gap: 4px;
+      }
+      
+      .round-button {
+        width: 35px;
+        height: 35px;
+      }
+      
+      #compass {
+        top: 5px;
+        right: 5px;
+        width: 30px;
+        height: 30px;
+      }
+    }
+
+     /* TOUCH OPTIMIZATION */
+    @media (hover: none) and (pointer: coarse) {
+      .round-button {
+        min-width: 44px;
+        min-height: 44px;
+      }
+      
+      button {
+        min-height: 40px;
+        padding: 8px 12px;
+      }
+      
+      .bottom-nav button {
+        min-height: 36px;
+        padding: 6px 10px;
+      }
+    }
+
+    /* HIGH DPI DISPLAYS */
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+      .round-button,
+      button {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="debug"></div>
+
+<div id="compass">
+  <div id="compass-needle"></div>
+  <div id="compass-center"></div>
+</div>
+
+<div id="map-container">
+  <div id="map"></div>
+</div>
+
+<!-- Top tracker bar -->
+<div class="top-bar">
+  <button id="startBtn" class="round-button" onclick="startTracking()">▶️</button>
+  <button id="pauseBtn" class="round-button" onclick="togglePause()">⏸</button>
+  <button id="stopBtn" class="round-button" onclick="stopTracking()">⏹</button>
+  <span id="timer">00:00:00</span>
+  <span>|</span>
+  <span id="distance">0.00 km</span>
+</div>
+
+  <div id="localStorageStatus" class="storage-monitor">
+    <div id="storageHeader" style="cursor: pointer;">📦 localStorage Monitor ▼</div>
+    <div id="storageContent"></div>
+    <audio id="storageAlertAudio" style="display:none">
+      <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YQAAAAA=" type="audio/wav">
+    </audio>
+  </div>
+  
+<!-- Floating control buttons -->
+<div class="floating-left">
+  <button id="toggleBtn" class="round-button"><svg viewBox="0 0 24 24">
+        <path d="M12 2l3 3-3 3"/>
+        <path d="M9 12h6"/>
+        <path d="M21 12c0 5-4 9-9 9s-9-4-9-9 4-9 9-9"/>
+        <path d="M16 16l-4-4"/>
+    </svg></button>
+<button class="round-button" onclick="openAccessibilityForm()">
+<svg viewBox="0 0 24 24">
+                <!-- Person's head -->
+                <circle cx="15" cy="6" r="2" fill="white"/>
+                <!-- Person's body (simple vertical line) -->
+                <rect x="14" y="8" width="2" height="6" fill="white"/>
+                <!-- Person's extended arm -->
+                <rect x="16" y="10" width="4" height="1.5" fill="white"/>
+                <!-- Large wheelchair wheel -->
+                <circle cx="9" cy="16" r="5" fill="none" stroke="white" stroke-width="2"/>
+                <!-- Simplified seat connection -->
+                <rect x="9" y="13" width="5" height="1.5" fill="white"/>
+                <!-- Small front wheel -->
+                <circle cx="17" cy="19" r="1" fill="white"/>
+            </svg>
+</button>
+<!--   <button class="round-button" onclick="toggleDarkMode()">🌓</button> -->
+</div>
+<!-- ♿🧭 -->
+<!-- <div class="floating-right">
+  <button class="round-button" onclick="toggleMediaPanel()">➕</button>
+</div> -->
+
+<div class="floating-right" id="mediaPanel">
+  <button id="takePhotoBtn" class="round-button" onclick="capturePhoto()"><svg viewBox="0 0 24 24">
+        <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+        <circle cx="12" cy="13" r="4"/>
+    </svg></button>
+  <button class="round-button" onclick="addTextNote()"><svg viewBox="0 0 24 24">
+        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+        <path d="M14 2v6h6"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <line x1="10" y1="9" x2="8" y2="9"/>
+    </svg></button>
+  <button class="round-button" onclick="showRouteDataOnMap()"><svg viewBox="0 0 24 24">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <path d="M21 15l-5-5L5 21"/>
+        <path d="M12 7h5v5"/>
+        <path d="M17 7l-8 8"/>
+    </svg></button>
+</div>
+
+<!-- Bottom Navigation Bar -->
+<div id="bottomNav" class="bottom-nav">
+  <!-- Export Icon -->
+        <div class="button-container">
+            <button class="nav-button" onclick="togglePanel('exportPanel')">
+                <svg viewBox="0 0 24 24">
+                    <!-- Box/container -->
+                    <rect x="3" y="8" width="18" height="12" rx="2"/>
+                    <!-- Export arrow pointing up and out -->
+                    <path d="M12 2v10"/>
+                    <path d="M8 6l4-4 4 4"/>
+                    <!-- Document/content lines inside box -->
+                    <path d="M7 14h4"/>
+                    <path d="M7 17h6"/>
+                </svg>
+            </button>
+<!--             <div class="button-label">Export</div> -->
+        </div>
+        
+        <!-- Summaries Icon -->
+        <div class="button-container">
+            <button class="nav-button" onclick="togglePanel('summaryPanel')">
+                <svg viewBox="0 0 24 24">
+                    <!-- Document stack -->
+                    <rect x="4" y="4" width="16" height="16" rx="2"/>
+                    <rect x="2" y="6" width="16" height="16" rx="2" fill="none"/>
+                    <!-- Summary text lines (getting shorter) -->
+                    <path d="M8 9h8"/>
+                    <path d="M8 12h6"/>
+                    <path d="M8 15h4"/>
+                </svg>
+            </button>
+<!--             <div class="button-label">Summaries</div> -->
+        </div>
+        
+        <!-- Dev Tool Icon -->
+        <div class="button-container">
+            <button class="nav-button" onclick="togglePanel('devToolsPanel')">
+                <svg viewBox="0 0 24 24">
+                    <!-- Code brackets -->
+                    <path d="M8 3L2 9l6 6"/>
+                    <path d="M16 3l6 6-6 6"/>
+                    <!-- Code line in middle -->
+                    <path d="M10 12h4"/>
+                </svg>
+            </button>
+<!--             <div class="button-label">Dev Tool</div> -->
+        </div>
+
+
+</div>
+
+<!-- Panels -->
+<div id="exportPanel" class="bottom-popup hidden">
+  <button id="prepareAndExportBtn" onclick="prepareAndExport()">📦 Export Last Route</button>
+  <button id="exportAllRoutesBtn" onclick="exportAllRoutes()">🌍 Export All Routes</button>
+  <button id="exportDataBtn" onclick="exportData()">📄 JSON</button>
+  <button id="exportPDFBtn" onclick="exportPDF()">📄 PDF</button>
+  <button id="exportGPXBtn" onclick="exportGPX()">📍 GPX</button>
+</div>
+
+<div id="summaryPanel" class="bottom-popup hidden">
+  <button id="toggleArchivePanelBtn" onclick="toggleArchivePanel()">📜 Browse Summaries</button>
+  <div id="archivePanel" class="toggle-panel"></div>
+  <button id="clearArchiveBtnBtn" onclick="SummaryArchive.clearAll()">🗑️ Clear All Summaries</button>
+  <button id="clearAllSessionsBtn" onclick="clearAllSessions()">🗑️ Clear Saved Routes</button>
+  <button id="clearAllAppDataBtn" onclick="clearAllAppData()">🧹 Clear Everything</button>
+</div>
+
+<div id="devToolsPanel" class="bottom-popup hidden">
+  <button onclick="showStorageMonitor()">🧪 Storage Monitor</button>
+  <button onclick="triggerImport()">📥 Import Route (JSON/GPX)</button>
+  <button id="resetBtn" onclick="confirmAndResetApp()">📍 Reset App</button>
+</div>
+
+<!-- Accessibility Form -->
+<div id="accessibilityOverlay" style="display:none;">
+  <div id="accessibilityFormContainer">
+    <h2>🧭 טופס נגישות</h2>
+    <form id="accessibilityForm">
+      <button type="button" onclick="closeAccessibilityForm()">🚪 סגור</button>
+
+      <label>חניות נכים – כמה:</label>
+      <input type="number" name="disabledParkingCount" required>
+      <label>תמונה:</label>
+      <input type="file" name="disabledParkingImage" accept="image/*"><br><br>
+
+      <label>תיאור הדרך:</label>
+      <select name="pathType" required>
+        <option value="">בחר</option>
+        <option>אספלט</option>
+        <option>בטון</option>
+        <option>דק עץ</option>
+        <option>שביל כורכר (לא נגיש)</option>
+      </select>
+      <label>תמונה:</label>
+      <input type="file" name="pathImage" accept="image/*"><br><br>
+
+      <label>אורך הדרך הנגישה (במטרים):</label>
+      <input type="number" name="accessibleLength" required>
+
+      <label>סוג המסלול:</label>
+      <select name="routeType">
+        <option>הלוך חזור</option>
+        <option>מעגלי</option>
+      </select>
+
+      <label>שיפוע השביל:</label>
+      <select name="slope">
+        <option>אופקי</option>
+        <option>שיפועים מתונים</option>
+        <option>שיפועים תלולים (לא נגיש)</option>
+      </select>
+
+      <label>נקודות עניין לאורך הדרך:</label>
+      <textarea name="pointsOfInterest"></textarea>
+      <label>תמונה:</label>
+      <input type="file" name="poiImage" accept="image/*"><br><br>
+
+      <label>תצפיות:</label>
+      <input type="checkbox" name="lookouts"> יש
+      <label>תמונה:</label>
+      <input type="file" name="lookoutImage" accept="image/*"><br><br>
+
+      <label>פינות פיקניק נגישות:</label>
+      <input type="checkbox" name="picnicSpots"> יש
+      <label>תמונה:</label>
+      <input type="file" name="picnicImage" accept="image/*"><br><br>
+
+      <label>שירותי נכים:</label>
+      <input type="checkbox" name="accessibleToilets"> יש
+      <label>תמונה:</label>
+      <input type="file" name="toiletImage" accept="image/*"><br><br>
+
+      <label>ספסלים לאורך הדרך:</label>
+      <input type="checkbox" name="benches"> יש
+      <label>תמונה:</label>
+      <input type="file" name="benchImage" accept="image/*"><br><br>
+
+      <label>הצללה:</label>
+      <select name="shade">
+        <option>מוצל</option>
+        <option>מוצל חלקית</option>
+        <option>לא מוצל</option>
+      </select><br><br>
+
+      <button type="submit">✔️ שמור</button>
+      <button type="button" onclick="closeAccessibilityForm()">❌ ביטול</button>
+    </form>
+<!--     <h2>🧭 Accessibility Questionnaire</h2>
+    <form id="accessibilityForm">
+      <button type="button" onclick="closeAccessibilityForm()">🚪 Close</button>
+
+      <label>Disabled Parking Spaces - Count:</label>
+      <input type="number" name="disabledParkingCount" required>
+      <label>Photo:</label>
+      <input type="file" name="disabledParkingImage" accept="image/*">
+
+      <label>Path Description:</label>
+      <select name="pathType" required>
+        <option value="">Select</option>
+        <option>Asphalt</option>
+        <option>Concrete</option>
+        <option>Wooden Deck</option>
+        <option>Dirt Path (Not Accessible)</option>
+      </select>
+      <label>Photo:</label>
+      <input type="file" name="pathImage" accept="image/*">
+
+      <label>Accessible Path Length (meters):</label>
+      <input type="number" name="accessibleLength" required>
+
+      <label>Route Type:</label>
+      <select name="routeType">
+        <option>Out and Back</option>
+        <option>Loop</option>
+      </select>
+
+      <label>Trail Slope:</label>
+      <select name="slope">
+        <option>Flat</option>
+        <option>Moderate Slopes</option>
+        <option>Steep Slopes (Not Accessible)</option>
+      </select>
+
+      <label>Points of Interest:</label>
+      <textarea name="pointsOfInterest" rows="3"></textarea>
+      <label>Photo:</label>
+      <input type="file" name="poiImage" accept="image/*">
+
+      <label>Viewpoints:</label>
+      <input type="checkbox" name="lookouts"> Available
+      <label>Photo:</label>
+      <input type="file" name="lookoutImage" accept="image/*">
+
+      <label>Accessible Picnic Areas:</label>
+      <input type="checkbox" name="picnicSpots"> Available
+      <label>Photo:</label>
+      <input type="file" name="picnicImage" accept="image/*">
+
+      <label>Accessible Restrooms:</label>
+      <input type="checkbox" name="accessibleToilets"> Available
+      <label>Photo:</label>
+      <input type="file" name="toiletImage" accept="image/*">
+
+      <label>Benches Along Path:</label>
+      <input type="checkbox" name="benches"> Available
+      <label>Photo:</label>
+      <input type="file" name="benchImage" accept="image/*">
+
+      <label>Shade:</label>
+      <select name="shade">
+        <option>Shaded</option>
+        <option>Partially Shaded</option>
+        <option>No Shade</option>
+      </select>
+
+      <button type="submit">✔️ Save</button>
+      <button type="button" onclick="closeAccessibilityForm()">❌ Cancel</button>
+    </form> -->
+  </div>
+</div>
+
+<!-- Hidden elements preserved for app logic -->
+<div id="controls" style="display:none;"></div>
+<div id="historyPanel" style="display:none;"><ul id="historyList"></ul></div>
+<input type="file" id="photoInput" accept="image/*" capture="environment" style="display:none;" />
+<input type="file" id="videoInput" accept="video/*" capture style="display:none;" />
+<input type="file" id="importFile" accept=".json,.gpx" style="display:none;" />
+
+<div class="sessions" style="display:none;">
+  <h3>📂 Saved Routes</h3>
+  <ul id="savedSessionsList"></ul>
+</div>
+
+<script>
+// Toggle media panel
+function toggleMediaPanel() {
+  const panel = document.getElementById("mediaPanel");
+  panel.classList.toggle("open");
+}
+
+// Toggle bottom panels
+function togglePanel(panelId) {
+  // Hide all panels first
+  const panels = document.querySelectorAll('.bottom-popup');
+  panels.forEach(panel => {
+    if (panel.id !== panelId) {
+      panel.classList.add('hidden');
+    }
+  });
+  
+  // Toggle the requested panel
+  const targetPanel = document.getElementById(panelId);
+  if (targetPanel) {
+    targetPanel.classList.toggle('hidden');
+  }
+}
+
+// Dark mode toggle
+function toggleDarkMode() {
+  document.body.classList.toggle('dark-mode');
+  localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+}
+
+// Load dark mode preference
+if (localStorage.getItem('darkMode') === 'true') {
+  document.body.classList.add('dark-mode');
+}
+
+// Accessibility form functions
+function openAccessibilityForm() {
+  document.getElementById('accessibilityOverlay').style.display = 'flex';
+}
+
+function closeAccessibilityForm() {
+  document.getElementById('accessibilityOverlay').style.display = 'none';
+}
+
+// Placeholder functions for app functionality
+function startTracking() { console.log('Start tracking'); }
+function togglePause() { console.log('Toggle pause'); }
+function stopTracking() { console.log('Stop tracking'); }
+function capturePhoto() { console.log('Capture photo'); }
+function addTextNote() { console.log('Add text note'); }
+function showRouteDataOnMap() { console.log('Show route data'); }
+function prepareAndExport() { console.log('Prepare and export'); }
+function exportAllRoutes() { console.log('Export all routes'); }
+function exportData() { console.log('Export data'); }
+function exportPDF() { console.log('Export PDF'); }
+function exportGPX() { console.log('Export GPX'); }
+function toggleArchivePanel() { console.log('Toggle archive panel'); }
+function clearAllSessions() { console.log('Clear all sessions'); }
+function clearAllAppData() { console.log('Clear all app data'); }
+function showStorageMonitor() { console.log('Show storage monitor'); }
+function triggerImport() { console.log('Trigger import'); }
+function confirmAndResetApp() { console.log('Confirm and reset app'); }
+
+// Compass and rotation functionality
+let rotationEnabled = false;
+let currentHeading = 0;
+let smoothedHeading = 0;
+let animationFrameId = null;
+let lastUpdateTime = 0;
+let headingHistory = [];
+const HISTORY_SIZE = 5;
+const SMOOTHING_FACTOR = 0.15;
+const MIN_CHANGE_THRESHOLD = 0.3;
+
+const mapContainer = document.getElementById('map-container');
+const toggleBtn = document.getElementById('toggleBtn');
+const debugDiv = document.getElementById('debug');
+const compassDiv = document.getElementById('compass');
+
+// Initialize map (placeholder)
+// const map = L.map('map').setView([51.505, -0.09], 13);
+// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//   attribution: '&copy; OpenStreetMap contributors'
+// }).addTo(map);
+
+// Utility functions for compass
+function normalizeAngle(angle) {
+  return ((angle % 360) + 360) % 360;
+}
+
+function angleDifference(target, current) {
+  const diff = normalizeAngle(target - current);
+  return diff > 180 ? diff - 360 : diff;
+}
+
+function addToHistory(heading) {
+  headingHistory.push(heading);
+  if (headingHistory.length > HISTORY_SIZE) {
+    headingHistory.shift();
+  }
+}
+
+function getSmoothedHeading() {
+  if (headingHistory.length === 0) return currentHeading;
+  
+  let sinSum = 0, cosSum = 0;
+  for (let heading of headingHistory) {
+    const rad = heading * Math.PI / 180;
+    sinSum += Math.sin(rad);
+    cosSum += Math.cos(rad);
+  }
+  
+  const avgRad = Math.atan2(sinSum / headingHistory.length, cosSum / headingHistory.length);
+  return normalizeAngle(avgRad * 180 / Math.PI);
+}
+
+// Toggle button handler
+  toggleBtn.addEventListener('click', () => {
+    rotationEnabled = !rotationEnabled;
+    toggleBtn.style.backgroundColor = rotationEnabled ? "green" : "rgba(0, 0, 0, 0.9)";
+    
+    if (rotationEnabled) {
+      // Initialize smoothed heading to current heading
+      smoothedHeading = currentHeading;
+      headingHistory = [currentHeading];
+      debugDiv.style.display = 'block';
+      startRotationLoop();
+    } else {
+      cancelAnimationFrame(animationFrameId);
+      mapContainer.style.transform = 'rotate(0deg)';
+      compassDiv.style.transform = 'rotate(0deg)';
+      debugDiv.style.display = 'none';
+    }
+  });
+
+  // Enhanced compass reading with error checking
+  function handleOrientation(event) {
+    let heading = null;
+    
+    // Try different compass heading sources
+    if (typeof event.webkitCompassHeading !== "undefined") {
+      heading = event.webkitCompassHeading;
+    } else if (event.alpha !== null && event.alpha !== undefined) {
+      heading = 360 - event.alpha; // Convert to compass heading
+    }
+    
+    // Validate heading
+    if (heading !== null && !isNaN(heading) && isFinite(heading)) {
+      heading = normalizeAngle(heading);
+      
+      // Only update if significant change to reduce noise
+      const change = Math.abs(angleDifference(heading, currentHeading));
+      if (change > MIN_CHANGE_THRESHOLD || headingHistory.length === 0) {
+        currentHeading = heading;
+        addToHistory(heading);
+      }
+    }
+  }
+
+  // Request permission for device orientation on iOS
+  function requestOrientationPermission() {
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      DeviceOrientationEvent.requestPermission()
+        .then(permissionState => {
+          if (permissionState === 'granted') {
+            attachOrientationListeners();
+          } else {
+            alert('Device orientation permission denied');
+          }
+        })
+        .catch(console.error);
+    } else {
+      attachOrientationListeners();
+    }
+  }
+
+  function attachOrientationListeners() {
+    if ('ondeviceorientationabsolute' in window) {
+      window.addEventListener('deviceorientationabsolute', handleOrientation, true);
+    } else {
+      window.addEventListener('deviceorientation', handleOrientation, true);
+    }
+  }
+
+  // Start rotation animation loop
+  function startRotationLoop() {
+    if (!rotationEnabled) return;
+    
+    const now = performance.now();
+    const deltaTime = now - lastUpdateTime;
+    
+    // Throttle updates to ~60fps
+    if (deltaTime >= 16) {
+      updateRotation();
+      lastUpdateTime = now;
+    }
+    
+    animationFrameId = requestAnimationFrame(startRotationLoop);
+  }
+
+  // Smooth rotation update
+  function updateRotation() {
+    if (!rotationEnabled) return;
+    
+    const targetHeading = getSmoothedHeading();
+    const diff = angleDifference(targetHeading, smoothedHeading);
+    
+    // Apply exponential smoothing
+    smoothedHeading += diff * SMOOTHING_FACTOR;
+    smoothedHeading = normalizeAngle(smoothedHeading);
+    
+    // Only apply transform if change is significant
+    if (Math.abs(diff) > 0.1) {
+      mapContainer.style.transform = `rotate(${-smoothedHeading}deg)`;
+      compassDiv.style.transform = `rotate(${smoothedHeading}deg)`;
+    }
+    
+    // Update debug info
+    debugDiv.innerHTML = `
+      Raw: ${currentHeading.toFixed(1)}°<br>
+      Target: ${targetHeading.toFixed(1)}°<br>
+      Smooth: ${smoothedHeading.toFixed(1)}°<br>
+      Diff: ${diff.toFixed(1)}°
+    `;
+  }
+
+  // Initialize orientation listeners
+  if (window.location.protocol === 'https:') {
+    requestOrientationPermission();
+  } else {
+    attachOrientationListeners();
+  }
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<!-- Leaflet Control Geocoder CSS + JS -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"
+/>
+<script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="app.js"></script>
+
+<!-- Developer Tools Panel -->
+<div id="developerToolsPanel" class="bottom-panel" style="display:none;">
+  <button onclick="toggleDarkMode()">🌙☀️ Dark/Light Mode</button>
+  <button id="clearAllAppDataBtn" onclick="clearAllAppData()">🧹 Clear Everything</button>
+  <button id="clearAllSessionsBtn" onclick="clearAllSessions()">🗑️ Clear All Saved Routes</button>
+  <button id="resetBtn" onclick="confirmAndResetApp()">📍**!Reset App!**📍</button>
+  <button onclick="triggerImport()">📥 Import Route (JSON/GPX)</button>
+  <button onclick="showPhotoCleanupDialog()">📥 Handle photos (JSON/GPX)</button>
+</div>
+
+</body>
+</html>
