@@ -1252,8 +1252,8 @@
 <div id="accessibilityOverlay" style="display:none;">
   <div id="accessibilityFormContainer" class="container">
     <div class="header">
-            <h1>🌲 Nature Trail Accessibility Survey</h1>
-            <p>Help others discover accessible outdoor experiences</p>
+            <h1>🌲 סקר נגישות</h1>
+            <p>עזור לאחרים למצוא חוויות חוץ נגישות</p>
             <div class="accessibility-icons">
                 <span class="icon">♿</span>
                 <span class="icon">🦯</span>
@@ -1268,31 +1268,31 @@
             <!-- Basic Trail Information -->
             <div class="section">
                 <div class="section-header" onclick="toggleSection(this)">
-                    <h2>🗺️ Basic Trail Information</h2>
+                    <h2>🗺️ מידע בסיסי על השביל</h2>
                     <span class="toggle-icon">▼</span>
                 </div>
                 <div class="section-content active">
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="trailName">Trail Name <span class="required">*</span></label>
+                        <label for="trailName">שם השביל (חובה) <span class="required">*</span></label>
                         <input type="text" id="trailName" name="trailName" required>
                     </div>
                     <div class="form-group">
-                        <label for="location">Location/Address <span class="required">*</span></label>
+                        <label for="location">מיקום / כתובת (חובה) <span class="required">*</span></label>
                         <input type="text" id="location" name="location" required>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="trailLength">Trail Length (miles/km)</label>
+                        <label for="trailLength">אורך השביל (ק"מ)</label>
                         <input type="number" id="trailLength" name="trailLength" step="0.1" min="0">
                     </div>
                     <div class="form-group">
-                        <label for="estimatedTime">Estimated Duration</label>
+                        <label for="estimatedTime">משך זמן משוער</label>
                         <select id="estimatedTime" name="estimatedTime">
-                            <option value="">Select duration</option>
+                            <option value="">בחירה מתוך רשימה</option>
                             <option value="under-30">Under 30 minutes</option>
                             <option value="30-60">30-60 minutes</option>
                             <option value="1-2-hours">1-2 hours</option>
@@ -1304,23 +1304,23 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="trailType">Trail Type</label>
+                    <label for="trailType">סוג מסלול</label>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
                             <input type="checkbox" id="loop" name="trailType" value="loop">
-                            <label for="loop">Loop Trail</label>
+                            <label for="loop">מעגלי</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="outBack" name="trailType" value="out-back">
-                            <label for="outBack">Out and Back</label>
+                            <label for="outBack">הלוך וחזור</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="pointToPoint" name="trailType" value="point-to-point">
-                            <label for="pointToPoint">Point to Point</label>
+                            <label for="pointToPoint">נקודה לנקודה</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="boardwalk" name="trailType" value="boardwalk">
-                            <label for="boardwalk">Boardwalk</label>
+                            <label for="boardwalk">טיילת</label>
                         </div>
                     </div>
                 </div>
@@ -1329,48 +1329,48 @@
             <!-- Path Surface & Terrain -->
             <div class="section">
                 <div class="section-header" onclick="toggleSection(this)">
-                    <h2>🛤️ Path Surface & Terrain</h2>
+                    <h2>🛤️ סוג משטח וטופוגרפיה</h2>
                     <span class="toggle-icon">▼</span>
                 </div>
                 <div class="section-content">
                 
                 <div class="form-group">
-                    <label>Primary Surface Type <span class="required">*</span></label>
+                    <label>סוג משטח ראשי (חובה) <span class="required">*</span></label>
                     <div class="radio-group">
                         <div class="radio-item">
                             <input type="radio" id="paved" name="surfaceType" value="paved" required>
-                            <label for="paved">Paved/Asphalt</label>
+                            <label for="paved">סלול/אספלט</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" id="concrete" name="surfaceType" value="concrete" required>
-                            <label for="concrete">Concrete</label>
+                            <label for="concrete">בטון</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" id="gravel" name="surfaceType" value="gravel" required>
-                            <label for="gravel">Gravel/Stone</label>
+                            <label for="gravel">חצץ</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" id="dirt" name="surfaceType" value="dirt" required>
-                            <label for="dirt">Dirt/Soil</label>
+                            <label for="dirt">אדמה</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" id="wood" name="surfaceType" value="wood" required>
-                            <label for="wood">Wood/Boardwalk</label>
+                            <label for="wood">עץ</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" id="mixed" name="surfaceType" value="mixed" required>
-                            <label for="mixed">Mixed Surfaces</label>
+                            <label for="mixed">משטחים מעורבים</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="pathWidth">Path Width (feet/meters)</label>
+                        <label for="pathWidth">רוחב השביל</label>
                         <input type="number" id="pathWidth" name="pathWidth" step="0.5" min="0">
                     </div>
                     <div class="form-group">
-                        <label for="surfaceCondition">Surface Condition</label>
+                        <label for="surfaceCondition">מצב המשטח</label>
                         <select id="surfaceCondition" name="surfaceCondition">
                             <option value="">Select condition</option>
                             <option value="excellent">Excellent - Smooth, well-maintained</option>
@@ -1382,7 +1382,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Trail Difficulty Rating</label>
+                    <label>דירוג קושי: 1–5</label>
                     <div class="rating-scale">
                         <span>Easy</span>
                         <input type="radio" name="difficulty" value="1">
@@ -1401,7 +1401,7 @@
             <!-- Gradient & Elevation -->
             <div class="section">
                 <div class="section-header" onclick="toggleSection(this)">
-                    <h2>⛰️ Gradient & Elevation</h2>
+                    <h2>⛰️ שיפוע וגובה</h2>
                     <span class="toggle-icon">▼</span>
                 </div>
                 <div class="section-content">
