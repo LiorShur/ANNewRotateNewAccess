@@ -1380,12 +1380,12 @@
                         <label for="estimatedTime">משך זמן משוער</label>
                         <select id="estimatedTime" name="estimatedTime">
                             <option value="">בחירה מתוך רשימה</option>
-                            <option value="under-30">Under 30 minutes</option>
-                            <option value="30-60">30-60 minutes</option>
-                            <option value="1-2-hours">1-2 hours</option>
-                            <option value="2-4-hours">2-4 hours</option>
-                            <option value="half-day">Half day</option>
-                            <option value="full-day">Full day</option>
+                            <option value="under-30">פחות מ 30 דקות</option>
+                            <option value="30-60"> 30-60 דקות</option>
+                            <option value="1-2-hours">1-2 שעות </option>
+                            <option value="2-4-hours">2-4 שעות </option>
+                            <option value="half-day">חצי יום </option>
+                            <option value="full-day">יום מלא </option>
                         </select>
                     </div>
                 </div>
@@ -1459,11 +1459,11 @@
                     <div class="form-group">
                         <label for="surfaceCondition">מצב המשטח</label>
                         <select id="surfaceCondition" name="surfaceCondition">
-                            <option value="">Select condition</option>
-                            <option value="excellent">Excellent - Smooth, well-maintained</option>
-                            <option value="good">Good - Minor irregularities</option>
-                            <option value="fair">Fair - Some bumps, cracks, or loose material</option>
-                            <option value="poor">Poor - Significant obstacles or damage</option>
+                            <option value="">בחר מצב</option>
+                            <option value="excellent">מצויין - חלק ומתוחזק היטב</option>
+                            <option value="good">טוב -הפרעות קלות</option>
+                            <option value="fair">סביר - בליטות, סדקים וחלקים רופפים</option>
+                            <option value="poor">גרוע -מכשולים ו/או נזק משמעותי</option>
                         </select>
                     </div>
                 </div>
@@ -1495,53 +1495,53 @@
                 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="maxGrade">Maximum Grade/Slope (%)</label>
+                        <label for="maxGrade">שיפוע מרבי (%)</label>
                         <input type="number" id="maxGrade" name="maxGrade" step="0.5" min="0" max="100">
                         <div class="info-text">0% = flat, 5% = gentle slope, 10%+ = steep</div>
                     </div>
                     <div class="form-group">
-                        <label for="avgGrade">Average Grade/Slope (%)</label>
+                        <label for="avgGrade">שיפוע ממוצע (%)</label>
                         <input type="number" id="avgGrade" name="avgGrade" step="0.5" min="0" max="100">
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="elevationGain">Total Elevation Gain (feet/meters)</label>
+                        <label for="elevationGain">סה"כ עלייה בגובה (מטרים)</label>
                         <input type="number" id="elevationGain" name="elevationGain" min="0">
                     </div>
                     <div class="form-group">
-                        <label for="steepSections">Number of Steep Sections</label>
+                        <label for="steepSections">מספר מקטעים תלולים</label>
                         <input type="number" id="steepSections" name="steepSections" min="0">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Terrain Features</label>
+                    <label>מאפיינים טופוגרפיים</label>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
                             <input type="checkbox" id="stairs" name="terrainFeatures" value="stairs">
-                            <label for="stairs">Stairs/Steps</label>
+                            <label for="stairs">מדרגות</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="bridges" name="terrainFeatures" value="bridges">
-                            <label for="bridges">Bridges</label>
+                            <label for="bridges">גשרים</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="ramps" name="terrainFeatures" value="ramps">
-                            <label for="ramps">Ramps</label>
+                            <label for="ramps">רמפות</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="roots" name="terrainFeatures" value="roots">
-                            <label for="roots">Tree Roots</label>
+                            <label for="roots">שורשי עצים</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="rocks" name="terrainFeatures" value="rocks">
-                            <label for="rocks">Rocks/Boulders</label>
+                            <label for="rocks">סלעים</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="water" name="terrainFeatures" value="water">
-                            <label for="water">Water Crossings</label>
+                            <label for="water">מעברי מים</label>
                         </div>
                     </div>
                 </div>
@@ -1550,70 +1550,70 @@
             <!-- Mobility Accessibility -->
             <div class="section">
                 <div class="section-header" onclick="toggleSection(this)">
-                    <h2>♿ Mobility Accessibility</h2>
+                    <h2>♿ נגישות לניידות</h2>
                     <span class="toggle-icon">▼</span>
                 </div>
                 <div class="section-content">
                 
                 <div class="form-group">
-                    <label>Wheelchair Accessibility Level</label>
+                    <label>רמת נגישות לכיסא גלגלים</label>
                     <div class="radio-group">
                         <div class="radio-item">
                             <input type="radio" id="wheelchairFull" name="wheelchairAccess" value="fully-accessible">
-                            <label for="wheelchairFull">Fully Accessible</label>
+                            <label for="wheelchairFull">נגיש לחלוטין</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" id="wheelchairPartial" name="wheelchairAccess" value="partially-accessible">
-                            <label for="wheelchairPartial">Partially Accessible</label>
+                            <label for="wheelchairPartial"> נגיש חלקית</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" id="wheelchairAssist" name="wheelchairAccess" value="assistance-needed">
-                            <label for="wheelchairAssist">Accessible with Assistance</label>
+                            <label for="wheelchairAssist">עם סיוע</label>
                         </div>
                         <div class="radio-item">
                             <input type="radio" id="wheelchairNot" name="wheelchairAccess" value="not-accessible">
-                            <label for="wheelchairNot">Not Accessible</label>
+                            <label for="wheelchairNot">לא נגיש</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label>Mobility Aid Suitability</label>
+                    <label>התאמה לאביזרי ניידות</label>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
                             <input type="checkbox" id="manualWheelchair" name="mobilityAids" value="manual-wheelchair">
-                            <label for="manualWheelchair">Manual Wheelchair</label>
+                            <label for="manualWheelchair">כיסא גלגלים ידני</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="powerWheelchair" name="mobilityAids" value="power-wheelchair">
-                            <label for="powerWheelchair">Power Wheelchair</label>
+                            <label for="powerWheelchair">כיסא גלגלים חשמלי</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="scooter" name="mobilityAids" value="mobility-scooter">
-                            <label for="scooter">Mobility Scooter</label>
+                            <label for="scooter">קורקינט</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="walker" name="mobilityAids" value="walker">
-                            <label for="walker">Walker</label>
+                            <label for="walker">הליכון</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="crutches" name="mobilityAids" value="crutches">
-                            <label for="crutches">Crutches</label>
+                            <label for="crutches">קביים</label>
                         </div>
                         <div class="checkbox-item">
                             <input type="checkbox" id="cane" name="mobilityAids" value="cane">
-                            <label for="cane">Walking Cane</label>
+                            <label for="cane">מקל הליכה</label>
                         </div>
                     </div>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
-                        <label for="restAreas">Number of Rest Areas/Benches</label>
+                        <label for="restAreas">מספר אזורי מנוחה וספסלים</label>
                         <input type="number" id="restAreas" name="restAreas" min="0">
                     </div>
                     <div class="form-group">
-                        <label for="restInterval">Distance Between Rest Areas (feet/meters)</label>
+                        <label for="restInterval">המרחק ביניהם (מטרים)</label>
                         <input type="number" id="restInterval" name="restInterval" min="0">
                     </div>
                 </div>
@@ -1622,13 +1622,13 @@
             <!-- Visual Accessibility -->
             <div class="section">
                 <div class="section-header" onclick="toggleSection(this)">
-                    <h2>👁️ Visual Accessibility</h2>
+                    <h2>👁️ נגישות חזותית</h2>
                     <span class="toggle-icon">▼</span>
                 </div>
                 <div class="section-content">
                 
                 <div class="form-group">
-                    <label>Visual Navigation Features</label>
+                    <label>מאפייני ניווט חזותיים</label>
                     <div class="checkbox-group">
                         <div class="checkbox-item">
                             <input type="checkbox" id="tactileMarkers" name="visualFeatures" value="tactile-markers">
