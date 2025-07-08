@@ -2414,6 +2414,56 @@ function getSmoothedHeading() {
             alert('Survey submitted successfully! Thank you for your contribution to making nature accessible.');
         });
     </script>
+<!--               <script>
+        function toggleSection(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('active')) {
+                content.classList.remove('active');
+                icon.classList.remove('rotated');
+                content.style.display = 'none';
+            } else {
+                content.classList.add('active');
+                icon.classList.add('rotated');
+                content.style.display = 'block';
+            }
+        }
+
+        // Initialize first section as open
+        document.addEventListener('DOMContentLoaded', function() {
+            const firstSection = document.querySelector('.section-content');
+            const firstIcon = document.querySelector('.toggle-icon');
+            firstSection.style.display = 'block';
+            firstIcon.classList.add('rotated');
+        });
+
+        // Form submission handler
+        document.getElementById('accessibilityForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Collect form data
+            const formData = new FormData(this);
+            const data = {};
+            
+            // Handle regular form fields
+            for (let [key, value] of formData.entries()) {
+                if (data[key]) {
+                    if (Array.isArray(data[key])) {
+                        data[key].push(value);
+                    } else {
+                        data[key] = [data[key], value];
+                    }
+                } else {
+                    data[key] = value;
+                }
+            }
+            
+            // Display collected data (in a real application, this would be sent to a server)
+            console.log('Trail Accessibility Survey Data:', data);
+            alert('Survey submitted successfully! Thank you for your contribution to making nature accessible.');
+        });
+    </script> -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 <!-- Leaflet Control Geocoder CSS + JS -->
