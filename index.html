@@ -2834,18 +2834,25 @@ function getSmoothedHeading() {
         //     alert('Survey submitted successfully! Thank you for your contribution to making nature accessible.');
         // });
                 function toggleSection(header) {
-            const content = header.nextElementSibling;
-            const icon = header.querySelector('.toggle-icon');
-            
-            if (content.classList.contains('active')) {
-                content.classList.remove('active');
-                icon.classList.remove('rotated');
-                content.style.display = 'none';
-            } else {
-                content.classList.add('active');
-                icon.classList.add('rotated');
-                content.style.display = 'block';
-            }
+            const allContents = document.querySelectorAll('.section-content');
+    const allIcons = document.querySelectorAll('.toggle-icon');
+
+    const content = header.nextElementSibling;
+    const icon = header.querySelector('.toggle-icon');
+
+    // Close all sections
+    allContents.forEach(c => {
+        c.classList.remove('active');
+        c.style.display = 'none';
+    });
+    allIcons.forEach(i => i.classList.remove('rotated'));
+
+    // Toggle the selected one
+    if (!content.classList.contains('active')) {
+        content.classList.add('active');
+        content.style.display = 'block';
+        icon.classList.add('rotated');
+    }
         }
 
         // Initialize first section as open
