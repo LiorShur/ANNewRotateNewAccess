@@ -1599,7 +1599,7 @@ async function exportRouteSummary() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `route-summary-\${Date.now()}.zip\`;
+    a.download = `route-summary-${Date.now()}.zip`;
     a.click();
     console.log("✅ Route summary exported successfully.");
   } catch (e) {
@@ -1611,7 +1611,7 @@ async function exportRouteSummary() {
   initMap();
 }
 
-//For normal app route tracking
+// For normal app route tracking
 // async function exportRouteSummary() {
 //   console.log("📦 Attempting route export...");
 
