@@ -1383,9 +1383,9 @@ async function exportRouteSummary() {
   const getBoolLabel = (condition) => condition ? "✅ כן" : "❌ לא";
 
   // Media counts (from earlier in app)
-  const photoCount = photoCounter - 1;
-  const noteCount = noteCounter - 1;
-  const audioCount = audioCounter - 1;
+  const photoCount = 1;
+  const noteCount = 1;
+  const audioCount = 1;
 
   const accessibleLength = data.accessibleLength || 0;
 
