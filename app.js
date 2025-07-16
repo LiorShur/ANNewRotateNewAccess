@@ -1365,486 +1365,217 @@ async function generateElevationChartCanvas(route) {
   return canvas;
 }
 
-async function exportRouteSummary() {
-  const name = prompt("📁 הזן שם לקובץ הסיכום:", "מסלול נגיש");
-  if (!name) return;
-
-  const zip = new JSZip();
-  const mediaForArchive = {};
-  
-  // Load form data from localStorage
-  const formDataRaw = localStorage.getItem("accessibilityFormData");
-  const data = formDataRaw ? JSON.parse(formDataRaw) : {};
-
-  // Helpers
-  const mapField = (key, fallback = '---') =>
-    Array.isArray(data[key]) ? data[key].join(", ") : (data[key] || fallback);
-
-  const getBoolLabel = (condition) => condition ? "✅ כן" : "❌ לא";
-
-  // Media counts (from earlier in app)
-  const photoCount = 1;
-  const noteCount = 1;
-  const audioCount = 1;
-
-  const accessibleLength = data.accessibleLength || 0;
-
-  // START building HTML content
-  let htmlContent = `
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-  <meta charset="UTF-8">
-  <title>${name}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body { font-family: sans-serif; direction: rtl; background: #f0f0f0; margin: 0; padding: 20px; }
-    .container { background: white; padding: 20px; box-shadow: 0 0 10px #ccc; max-width: 900px; margin: auto; }
-    h1, h2, h3 { color: #2c5530; }
-    ul { list-style: none; padding: 0; }
-    li { margin-bottom: 5px; }
-    .section { margin-bottom: 30px; }
-    .media-counts { background: #e8f5e9; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
-    canvas { max-width: 100%; }
-    .legend span { margin-left: 10px; }
-    .tab-bar button { margin: 5px; }
-    .tab-bar { display: flex; gap: 10px; flex-wrap: wrap; }
-    .tab-content { display: none; }
-    .tab-content.active { display: block; margin-top: 20px; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>🏞️ ${mapField("trailName")} – סיכום מסלול</h1>
-    <div class="media-counts">
-      <b>📸 תמונות:</b> ${photoCount} |
-      <b>📝 הערות:</b> ${noteCount} |
-      <b>🎧 אודיו:</b> ${audioCount} |
-      <b>♿ אורך נגיש:</b> ${accessibleLength} מ'
-    </div>
-
-    <h2>🔎 מידע כללי</h2>
-    <ul>
-      <li><b>שם השביל:</b> ${mapField("trailName")}</li>
-      <li><b>מיקום:</b> ${mapField("location")}</li>
-      <li><b>אורך (ק"מ):</b> ${mapField("trailLength")}</li>
-      <li><b>משך משוער:</b> ${mapField("estimatedTime")}</li>
-      <li><b>סוג מסלול:</b> ${mapField("trailType")}</li>
-    </ul>
-
-    <div class="tab-bar">
-      <button onclick="openTab('map')">🗺️ מפה</button>
-      <button onclick="openTab('accessibility')">♿ נגישות</button>
-      <button onclick="openTab('terrain')">🛤️ טופוגרפיה</button>
-      <button onclick="openTab('facilities')">🏕️ מתקנים</button>
-      <button onclick="openTab('notes')">📝 הערות</button>
-    </div>
-
-    <div class="tab-content active" id="map">
-      <h3>🗺️ תצוגת מסלול</h3>
-      <div id="map" style="height: 400px;"></div>
-      <canvas id="chart" height="200"></canvas>
-      <div class="legend">
-        <b>מקרא שיפועים:</b><br>
-        <span style="color:green">🟩 ≤ 6% (קל)</span>
-        <span style="color:orange">🟧 6–10% (בינוני)</span>
-        <span style="color:red">🟥 > 10% (תלול)</span>
-      </div>
-    </div>
-  `;
-  htmlContent += `
-    <div class="tab-content" id="accessibility">
-      <h3>♿ פרטי נגישות</h3>
-      <ul>
-        <li><b>נגישות לכיסא גלגלים:</b> ${mapField("wheelchairAccess")}</li>
-        <li><b>אביזרי ניידות תואמים:</b> ${mapField("mobilityAids")}</li>
-        <li><b>מאפייני שטח:</b> ${mapField("terrainFeatures")}</li>
-        <li><b>מאפיינים חזותיים:</b> ${mapField("visualFeatures")}</li>
-        <li><b>תאורה:</b> ${mapField("lighting")}</li>
-        <li><b>מכשולים חזותיים:</b> ${mapField("hazards")}</li>
-        <li><b>שלטי ברייל:</b> ${data.visualFeatures?.includes("braille-signage") ? "✅ כן" : "❌ לא"}</li>
-        <li><b>נגיש לכלבי נחיה:</b> ${mapField("guideDogFriendly")}</li>
-        <li><b>מאפיינים שמיעתיים:</b> ${mapField("hearingFeatures")}</li>
-        <li><b>תקשורת חירום:</b> ${mapField("emergencyComm")}</li>
-        <li><b>מורכבות ניווט:</b> ${mapField("navigationComplexity")}</li>
-        <li><b>תמיכה קוגניטיבית:</b> ${mapField("cognitiveFeatures")}</li>
-        <li><b>רמת רעש:</b> ${mapField("noiseLevel")}</li>
-        <li><b>צפיפות:</b> ${mapField("crowdLevel")}</li>
-      </ul>
-    </div>
-
-    <div class="tab-content" id="terrain">
-      <h3>🛤️ סוג משטח וגובה</h3>
-      <ul>
-        <li><b>סוג משטח:</b> ${mapField("surfaceType")}</li>
-        <li><b>רוחב השביל:</b> ${mapField("pathWidth")} מטרים</li>
-        <li><b>מצב המשטח:</b> ${mapField("surfaceCondition")}</li>
-        <li><b>שיפוע מרבי:</b> ${mapField("maxGrade")}%</li>
-        <li><b>שיפוע ממוצע:</b> ${mapField("avgGrade")}%</li>
-        <li><b>עלייה בגובה:</b> ${mapField("elevationGain")} מטרים</li>
-        <li><b>מקטעים תלולים:</b> ${mapField("steepSections")}</li>
-      </ul>
-    </div>
-
-    <div class="tab-content" id="facilities">
-      <h3>🏕️ מתקנים ושירותים</h3>
-      <ul>
-        <li><b>חניה נגישה:</b> ${getBoolLabel(data.facilities?.includes("accessible-parking"))}</li>
-        <li><b>מקומות חניה נגישה:</b> ${mapField("accessibleParkingSpaces")}</li>
-        <li><b>שירותים נגישים:</b> ${getBoolLabel(data.facilities?.includes("accessible-restrooms"))}</li>
-        <li><b>ברזיות:</b> ${getBoolLabel(data.facilities?.includes("water-fountains"))}</li>
-        <li><b>אזורי פיקניק:</b> ${getBoolLabel(data.facilities?.includes("picnic-areas"))}</li>
-        <li><b>מחסות:</b> ${getBoolLabel(data.facilities?.includes("shelters"))}</li>
-        <li><b>מרכז מידע:</b> ${getBoolLabel(data.facilities?.includes("info-center"))}</li>
-        <li><b>תשלום בכניסה:</b> ${mapField("entryFee")}</li>
-        <li><b>תחבורה ציבורית:</b> ${mapField("publicTransport")}</li>
-      </ul>
-    </div>
-
-    <div class="tab-content" id="notes">
-      <h3>📝 הערות נוספות</h3>
-      <ul>
-        <li><b>זמנים מומלצים:</b> ${mapField("bestTimes")}</li>
-        <li><b>הערות כלליות:</b><br>${mapField("additionalNotes")}</li>
-        <li><b>שם הסוקר:</b> ${mapField("surveyorName")}</li>
-        <li><b>תאריך הסקר:</b> ${mapField("surveyDate")}</li>
-      </ul>
-    </div>
-  `;
-  htmlContent += `
-    </div>
-    <script>
-      function openTab(id) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.target.classList.add('active');
-      }
-
-      // Leaflet map and chart
-      document.addEventListener("DOMContentLoaded", () => {
-        const map = L.map('map');
-        const bounds = L.latLngBounds(${boundsVar});
-        map.fitBounds(bounds);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 18,
-          attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        const route = ${JSON.stringify(enriched)};
-        L.polyline(${JSON.stringify(pathCoords)}, { color: 'blue' }).addTo(map);
-
-        const haversine = (a, b) => {
-          const toRad = x => x * Math.PI / 180, R = 6371;
-          const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
-          const lat1 = toRad(a.lat), lat2 = toRad(b.lat);
-          const a_ = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
-          return R * 2 * Math.atan2(Math.sqrt(a_), Math.sqrt(1-a_));
-        };
-
-        for (let i = 1; i < route.length; i++) {
-          const a = route[i - 1], b = route[i];
-          const dist = haversine(a.coords, b.coords);
-          const elev = b.elevation - a.elevation;
-          const grade = (elev / (dist * 1000)) * 100;
-          const color = Math.abs(grade) > 10 ? 'red' : Math.abs(grade) > 6 ? 'orange' : 'green';
-          L.polyline([a.coords, b.coords], { color }).addTo(map);
-        }
-
-        new Chart(document.getElementById("chart"), {
-          type: "line",
-          data: {
-            labels: route.map((_, i) => i + 1),
-            datasets: [{
-              label: "גובה (מ')",
-              data: route.map(p => p.elevation),
-              borderColor: "green",
-              tension: 0.3,
-              fill: true
-            }]
-          }
-        });
-      });
-    </script>
-
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  </body>
-</html>
-`;
-
-  // Bundle media files into the ZIP
-  routeData.forEach((entry, i) => {
-    if (entry.type === "photo") {
-      const base64 = entry.content.split(",")[1];
-      mediaForArchive[`photo${i + 1}.jpg`] = base64;
-    } else if (entry.type === "text") {
-      mediaForArchive[`note${i + 1}.txt`] = entry.content;
-    }
-  });
-
-  // Add HTML to zip
-  zip.file("index.html", htmlContent);
-
-  // Add media to zip
-  Object.entries(mediaForArchive).forEach(([filename, base64]) => {
-    zip.file(filename, base64, { base64: true });
-  });
-
-  // Export ZIP
-  try {
-    const blob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `route-summary-${Date.now()}.zip`;
-    a.click();
-    console.log("✅ Route summary exported successfully.");
-  } catch (e) {
-    console.error("❌ Export failed:", e);
-    alert("❌ Failed to export route summary.");
-  }
-
-  resetApp();
-  initMap();
-}
-
-// For normal app route tracking
 // async function exportRouteSummary() {
-//   console.log("📦 Attempting route export...");
-
-//   if (!routeData || !Array.isArray(routeData) || routeData.length === 0) {
-//     alert("⚠️ No route data available to export. Please track or load a route first.");
-//     return;
-//   }
-
-//   const hasLocation = routeData.some(entry => entry.type === "location");
-//   if (!hasLocation) {
-//     alert("⚠️ No location data found in this session.");
-//     return;
-//   }
-
-//   const mostRecent = JSON.parse(localStorage.getItem("sessions") || "[]").slice(-1)[0];
-//   const defaultName = mostRecent?.name || "My Route";
-//   const name = prompt("Enter a title for this route summary:", defaultName);
+//   const name = prompt("📁 הזן שם לקובץ הסיכום:", "מסלול נגיש");
 //   if (!name) return;
 
 //   const zip = new JSZip();
-//   const notesFolder = zip.folder("notes");
-//   const imagesFolder = zip.folder("images");
-//   const audioFolder = zip.folder("audio");
 //   const mediaForArchive = {};
+  
+//   // Load form data from localStorage
+//   const formDataRaw = localStorage.getItem("accessibilityFormData");
+//   const data = formDataRaw ? JSON.parse(formDataRaw) : {};
 
-//   let markersJS = "";
-//   let pathCoords = [];
-//   let enriched = [];
-//   let noteCounter = 1;
-//   let photoCounter = 1;
-//   let audioCounter = 1;
+//   // Helpers
+//   const mapField = (key, fallback = '---') =>
+//     Array.isArray(data[key]) ? data[key].join(", ") : (data[key] || fallback);
 
-//   for (const entry of routeData) {
-//     if (entry.type === "location") {
-//       pathCoords.push([entry.coords.lat, entry.coords.lng]);
-//       enriched.push({ ...entry }); // clone for later enrichment
-//     } else if (entry.type === "text") {
-//       notesFolder.file(`note${noteCounter}.txt`, entry.content);
-//       markersJS += `
-// L.marker([${entry.coords.lat}, ${entry.coords.lng}], {
-//   icon: L.divIcon({ className: 'custom-icon', html: '📝', iconSize: [24, 24] })
-// })
-//   .addTo(map)
-//   .bindTooltip("Note ${noteCounter}")
-//   .bindPopup("<b>Note ${noteCounter}</b><br><pre>${entry.content}</pre>");
-// `;
-//       noteCounter++;
-//     } else if (entry.type === "photo") {
-//       const base64Data = entry.content.split(",")[1];
-//       imagesFolder.file(`photo${photoCounter}.jpg`, base64Data, { base64: true });
-//       markersJS += `
-// L.marker([${entry.coords.lat}, ${entry.coords.lng}], {
-//   icon: L.divIcon({ className: 'custom-icon', html: '📸', iconSize: [24, 24] })
-// })
-//   .addTo(map)
-//   .bindTooltip("Photo ${photoCounter}")
-//   .bindPopup("<b>Photo ${photoCounter}</b><br><img src='images/photo${photoCounter}.jpg' style='width:200px'>");
-// `;
-//       photoCounter++;
-//     } else if (entry.type === "audio") {
-//       const base64Data = entry.content.split(",")[1];
-//       audioFolder.file(`audio${audioCounter}.webm`, base64Data, { base64: true });
-//       markersJS += `
-// L.marker([${entry.coords.lat}, ${entry.coords.lng}])
-//   .addTo(map)
-//   .bindPopup("<b>Audio ${audioCounter}</b><br><audio controls src='audio/audio${audioCounter}.webm'></audio>");
-// `;
-//       audioCounter++;
-//     }
-//   }
+//   const getBoolLabel = (condition) => condition ? "✅ כן" : "❌ לא";
 
-//   // Enrich with elevation
-//   for (const entry of enriched) {
-//     if (entry.type === "location" && entry.elevation == null) {
-//       entry.elevation = await getElevation(entry.coords.lat, entry.coords.lng);
-//     }
-//   }
+//   // Media counts (from earlier in app)
+//   const photoCount = 1;
+//   const noteCount = 1;
+//   const audioCount = 1;
 
-//   // Accessibility computation
-//   let accessibleLength = 0;
-//   for (let i = 1; i < enriched.length; i++) {
-//     const a = enriched[i - 1], b = enriched[i];
-//     if (a.elevation != null && b.elevation != null) {
-//       const dist = haversineDistance(a.coords, b.coords);
-//       const elev = b.elevation - a.elevation;
-//       const grade = (elev / (dist * 1000)) * 100;
-//       if (Math.abs(grade) <= 6) accessibleLength += dist * 1000;
-//     }
-//   }
+//   const accessibleLength = data.accessibleLength || 0;
 
-//   // Elevation chart PNG
-//   const elevationCanvas = await generateElevationChartCanvas(enriched);
-//   const base64Chart = elevationCanvas.toDataURL("image/png");
-//   const elevationBlob = await new Promise(res => elevationCanvas.toBlob(res, "image/png"));
-//   zip.file("elevation.png", elevationBlob);
-//   mediaForArchive["elevation.png"] = base64Chart.split(",")[1];
-
-//   // const accessibilityEntry = routeData.find(e => e.type === "accessibility");
-//   // const accessibilityData = accessibilityEntry ? accessibilityEntry.content : null;
-//   // const accessibilityJSON = JSON.stringify(accessibilityData);
-
-//   const accessibilityData = JSON.parse(localStorage.getItem("accessibilityData") || "null");
-// console.log(accessibilityData);
-//   const boundsVar = JSON.stringify(pathCoords);
-
-//   const htmlContent = `
+//   // START building HTML content
+//   let htmlContent = `
 // <!DOCTYPE html>
-// <html lang="en">
+// <html lang="he" dir="rtl">
 // <head>
 //   <meta charset="UTF-8">
 //   <title>${name}</title>
 //   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
-//   <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-//   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 //   <style>
-//     body { margin: 0; font-family: Arial, sans-serif; }
-//     #map { height: 60vh; }
-//     #summaryPanel { padding: 20px; background: #f7f7f7; }
-//     #routeTitle { font-size: 24px; margin-bottom: 10px; color: #2c3e50; }
-//     .stats { margin-top: 10px; }
-//     .stats b { display: inline-block; width: 120px; }
-//     #description { margin-top: 20px; }
-//     #description textarea { width: 100%; height: 100px; font-size: 14px; }
-//     #accessibilityDetails ul { list-style-type: none; padding-left: 0; }
-//     #accessibilityDetails li { margin-bottom: 5px; }
+//     body { font-family: sans-serif; direction: rtl; background: #f0f0f0; margin: 0; padding: 20px; }
+//     .container { background: white; padding: 20px; box-shadow: 0 0 10px #ccc; max-width: 900px; margin: auto; }
+//     h1, h2, h3 { color: #2c5530; }
+//     ul { list-style: none; padding: 0; }
+//     li { margin-bottom: 5px; }
+//     .section { margin-bottom: 30px; }
+//     .media-counts { background: #e8f5e9; padding: 10px; border-radius: 5px; margin-bottom: 15px; }
+//     canvas { max-width: 100%; }
+//     .legend span { margin-left: 10px; }
+//     .tab-bar button { margin: 5px; }
+//     .tab-bar { display: flex; gap: 10px; flex-wrap: wrap; }
+//     .tab-content { display: none; }
+//     .tab-content.active { display: block; margin-top: 20px; }
 //   </style>
 // </head>
 // <body>
-// <div id="summaryPanel">
-//   <div id="routeTitle">📍 ${name}</div>
-//   <div class="stats">
-//     <div><b>Distance:</b> ${totalDistance.toFixed(2)} km</div>
-//     <div><b>Time:</b> ${document.getElementById("timer").textContent}</div>
-//     <div><b>Photos:</b> ${photoCounter - 1}</div>
-//     <div><b>Notes:</b> ${noteCounter - 1}</div>
-//     <div><b>Audios:</b> ${audioCounter - 1}</div>
-//     <p><b>Accessible Length:</b> ${accessibleLength.toFixed(0)} m</p>
-//   </div>
-//   <div id="description">
-//     <h4>General Description:</h4>
-//     <textarea placeholder="Add notes or observations about the route here..."></textarea>
+//   <div class="container">
+//     <h1>🏞️ ${mapField("trailName")} – סיכום מסלול</h1>
+//     <div class="media-counts">
+//       <b>📸 תמונות:</b> ${photoCount} |
+//       <b>📝 הערות:</b> ${noteCount} |
+//       <b>🎧 אודיו:</b> ${audioCount} |
+//       <b>♿ אורך נגיש:</b> ${accessibleLength} מ'
 //     </div>
-//   <div id="accessibilityDetailsContainer"></div>
-// </div>
 
-// <canvas id="chart" width="800" height="200">Chart Goes Here</canvas>
+//     <h2>🔎 מידע כללי</h2>
+//     <ul>
+//       <li><b>שם השביל:</b> ${mapField("trailName")}</li>
+//       <li><b>מיקום:</b> ${mapField("location")}</li>
+//       <li><b>אורך (ק"מ):</b> ${mapField("trailLength")}</li>
+//       <li><b>משך משוער:</b> ${mapField("estimatedTime")}</li>
+//       <li><b>סוג מסלול:</b> ${mapField("trailType")}</li>
+//     </ul>
 
-// <div style="margin-top: 10px;">
-//   <b>Gradient Legend:</b><br>
-//   <span style="color:green">🟩 ≤ 6% (Mild)</span>&nbsp;&nbsp;
-//   <span style="color:orange">🟧 6–10% (Moderate)</span>&nbsp;&nbsp;
-//   <span style="color:red">🟥 > 10% (Steep)</span>
-// </div>
+//     <div class="tab-bar">
+//       <button onclick="openTab('map')">🗺️ מפה</button>
+//       <button onclick="openTab('accessibility')">♿ נגישות</button>
+//       <button onclick="openTab('terrain')">🛤️ טופוגרפיה</button>
+//       <button onclick="openTab('facilities')">🏕️ מתקנים</button>
+//       <button onclick="openTab('notes')">📝 הערות</button>
+//     </div>
 
-// <div id="map"></div>
-// <script>
-// var map = L.map('map');
-// var bounds = L.latLngBounds(${boundsVar});
-// map.fitBounds(bounds);
-
-// L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//   maxZoom: 18,
-//   attribution: '&copy; OpenStreetMap contributors'
-// }).addTo(map);
-
-// L.polyline(${JSON.stringify(pathCoords)}, { color: 'blue' }).addTo(map);
-
-// const route = ${JSON.stringify(enriched)};
-//   const haversine = (a, b) => {
-//     const toRad = x => x * Math.PI / 180, R = 6371;
-//     const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
-//     const lat1 = toRad(a.lat), lat2 = toRad(b.lat);
-//     const a_ = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
-//     return R * 2 * Math.atan2(Math.sqrt(a_), Math.sqrt(1-a_));
-//   };
-
-//   for (let i = 1; i < route.length; i++) {
-//     const a = route[i - 1], b = route[i];
-//     const dist = haversine(a.coords, b.coords);
-//     const elev = b.elevation - a.elevation;
-//     const grade = (elev / (dist * 1000)) * 100;
-//     const color = Math.abs(grade) > 10 ? 'red' : Math.abs(grade) > 6 ? 'orange' : 'green';
-//     L.polyline([a.coords, b.coords], { color }).addTo(map);
-//   }
-
-
-// ${markersJS}
-
-// // Accessibility summary rendering
-// (function(){
-//   const data = ${JSON.stringify(accessibilityData)};
-//   if (!data) return;
-//   const html = \`
-//     <div id="accessibilityDetails">
-//       <h3>♿ Accessibility Details</h3>
+//     <div class="tab-content active" id="map">
+//       <h3>🗺️ תצוגת מסלול</h3>
+//       <div id="map" style="height: 400px;"></div>
+//       <canvas id="chart" height="200"></canvas>
+//       <div class="legend">
+//         <b>מקרא שיפועים:</b><br>
+//         <span style="color:green">🟩 ≤ 6% (קל)</span>
+//         <span style="color:orange">🟧 6–10% (בינוני)</span>
+//         <span style="color:red">🟥 > 10% (תלול)</span>
+//       </div>
+//     </div>
+//   `;
+//   htmlContent += `
+//     <div class="tab-content" id="accessibility">
+//       <h3>♿ פרטי נגישות</h3>
 //       <ul>
-//         <li><b>Disabled Parking:</b> \${data.disabledParkingCount}</li>
-//         <li><b>Path Type:</b> \${data.pathType}</li>
-//         <li><b>Accessible Length:</b> \${data.accessibleLength} m</li>
-//         <li><b>Route Type:</b> \${data.routeType}</li>
-//         <li><b>Slope:</b> \${data.slope}</li>
-//         <li><b>Points of Interest:</b> \${data.pointsOfInterest}</li>
-//         <li><b>Lookouts:</b> \${data.lookouts ? "Yes" : "No"}</li>
-//         <li><b>Picnic Spots:</b> \${data.picnicSpots ? "Yes" : "No"}</li>
-//         <li><b>Accessible Toilets:</b> \${data.accessibleToilets ? "Yes" : "No"}</li>
-//         <li><b>Benches:</b> \${data.benches ? "Yes" : "No"}</li>
-//         <li><b>Shade:</b> \${data.shade}</li>
+//         <li><b>נגישות לכיסא גלגלים:</b> ${mapField("wheelchairAccess")}</li>
+//         <li><b>אביזרי ניידות תואמים:</b> ${mapField("mobilityAids")}</li>
+//         <li><b>מאפייני שטח:</b> ${mapField("terrainFeatures")}</li>
+//         <li><b>מאפיינים חזותיים:</b> ${mapField("visualFeatures")}</li>
+//         <li><b>תאורה:</b> ${mapField("lighting")}</li>
+//         <li><b>מכשולים חזותיים:</b> ${mapField("hazards")}</li>
+//         <li><b>שלטי ברייל:</b> ${data.visualFeatures?.includes("braille-signage") ? "✅ כן" : "❌ לא"}</li>
+//         <li><b>נגיש לכלבי נחיה:</b> ${mapField("guideDogFriendly")}</li>
+//         <li><b>מאפיינים שמיעתיים:</b> ${mapField("hearingFeatures")}</li>
+//         <li><b>תקשורת חירום:</b> ${mapField("emergencyComm")}</li>
+//         <li><b>מורכבות ניווט:</b> ${mapField("navigationComplexity")}</li>
+//         <li><b>תמיכה קוגניטיבית:</b> ${mapField("cognitiveFeatures")}</li>
+//         <li><b>רמת רעש:</b> ${mapField("noiseLevel")}</li>
+//         <li><b>צפיפות:</b> ${mapField("crowdLevel")}</li>
 //       </ul>
-//     </div>\`;
-//   document.getElementById("accessibilityDetailsContainer").innerHTML = html;
-// })();
+//     </div>
 
-//   new Chart(document.getElementById("chart"), {
-//     type: "line",
-//     data: {
-//       labels: route.map((c, i) => i),
-//       datasets: [{
-//         label: "Elevation (m)",
-//         data: route.map(c => c.elevation),
-//         borderColor: "green",
-//         tension: 0.3,
-//         fill: true
-//       }]
-//     }
-//   });
+//     <div class="tab-content" id="terrain">
+//       <h3>🛤️ סוג משטח וגובה</h3>
+//       <ul>
+//         <li><b>סוג משטח:</b> ${mapField("surfaceType")}</li>
+//         <li><b>רוחב השביל:</b> ${mapField("pathWidth")} מטרים</li>
+//         <li><b>מצב המשטח:</b> ${mapField("surfaceCondition")}</li>
+//         <li><b>שיפוע מרבי:</b> ${mapField("maxGrade")}%</li>
+//         <li><b>שיפוע ממוצע:</b> ${mapField("avgGrade")}%</li>
+//         <li><b>עלייה בגובה:</b> ${mapField("elevationGain")} מטרים</li>
+//         <li><b>מקטעים תלולים:</b> ${mapField("steepSections")}</li>
+//       </ul>
+//     </div>
 
-// </script>
-// </body>
+//     <div class="tab-content" id="facilities">
+//       <h3>🏕️ מתקנים ושירותים</h3>
+//       <ul>
+//         <li><b>חניה נגישה:</b> ${getBoolLabel(data.facilities?.includes("accessible-parking"))}</li>
+//         <li><b>מקומות חניה נגישה:</b> ${mapField("accessibleParkingSpaces")}</li>
+//         <li><b>שירותים נגישים:</b> ${getBoolLabel(data.facilities?.includes("accessible-restrooms"))}</li>
+//         <li><b>ברזיות:</b> ${getBoolLabel(data.facilities?.includes("water-fountains"))}</li>
+//         <li><b>אזורי פיקניק:</b> ${getBoolLabel(data.facilities?.includes("picnic-areas"))}</li>
+//         <li><b>מחסות:</b> ${getBoolLabel(data.facilities?.includes("shelters"))}</li>
+//         <li><b>מרכז מידע:</b> ${getBoolLabel(data.facilities?.includes("info-center"))}</li>
+//         <li><b>תשלום בכניסה:</b> ${mapField("entryFee")}</li>
+//         <li><b>תחבורה ציבורית:</b> ${mapField("publicTransport")}</li>
+//       </ul>
+//     </div>
+
+//     <div class="tab-content" id="notes">
+//       <h3>📝 הערות נוספות</h3>
+//       <ul>
+//         <li><b>זמנים מומלצים:</b> ${mapField("bestTimes")}</li>
+//         <li><b>הערות כלליות:</b><br>${mapField("additionalNotes")}</li>
+//         <li><b>שם הסוקר:</b> ${mapField("surveyorName")}</li>
+//         <li><b>תאריך הסקר:</b> ${mapField("surveyDate")}</li>
+//       </ul>
+//     </div>
+//   `;
+//   htmlContent += `
+//     </div>
+//     <script>
+//       function openTab(id) {
+//         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+//         document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active'));
+//         document.getElementById(id).classList.add('active');
+//         event.target.classList.add('active');
+//       }
+
+//       // Leaflet map and chart
+//       document.addEventListener("DOMContentLoaded", () => {
+//         const map = L.map('map');
+//         const bounds = L.latLngBounds(${boundsVar});
+//         map.fitBounds(bounds);
+
+//         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+//           maxZoom: 18,
+//           attribution: '&copy; OpenStreetMap contributors'
+//         }).addTo(map);
+
+//         const route = ${JSON.stringify(enriched)};
+//         L.polyline(${JSON.stringify(pathCoords)}, { color: 'blue' }).addTo(map);
+
+//         const haversine = (a, b) => {
+//           const toRad = x => x * Math.PI / 180, R = 6371;
+//           const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+//           const lat1 = toRad(a.lat), lat2 = toRad(b.lat);
+//           const a_ = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+//           return R * 2 * Math.atan2(Math.sqrt(a_), Math.sqrt(1-a_));
+//         };
+
+//         for (let i = 1; i < route.length; i++) {
+//           const a = route[i - 1], b = route[i];
+//           const dist = haversine(a.coords, b.coords);
+//           const elev = b.elevation - a.elevation;
+//           const grade = (elev / (dist * 1000)) * 100;
+//           const color = Math.abs(grade) > 10 ? 'red' : Math.abs(grade) > 6 ? 'orange' : 'green';
+//           L.polyline([a.coords, b.coords], { color }).addTo(map);
+//         }
+
+//         new Chart(document.getElementById("chart"), {
+//           type: "line",
+//           data: {
+//             labels: route.map((_, i) => i + 1),
+//             datasets: [{
+//               label: "גובה (מ')",
+//               data: route.map(p => p.elevation),
+//               borderColor: "green",
+//               tension: 0.3,
+//               fill: true
+//             }]
+//           }
+//         });
+//       });
+//     </script>
+
+//     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+//     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+//     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+//   </body>
 // </html>
 // `;
 
-//   //const mediaForArchive = {};
+//   // Bundle media files into the ZIP
 //   routeData.forEach((entry, i) => {
 //     if (entry.type === "photo") {
 //       const base64 = entry.content.split(",")[1];
@@ -1853,10 +1584,16 @@ async function exportRouteSummary() {
 //       mediaForArchive[`note${i + 1}.txt`] = entry.content;
 //     }
 //   });
-//   SummaryArchive.saveToArchive(name, htmlContent, mediaForArchive);
 
+//   // Add HTML to zip
 //   zip.file("index.html", htmlContent);
 
+//   // Add media to zip
+//   Object.entries(mediaForArchive).forEach(([filename, base64]) => {
+//     zip.file(filename, base64, { base64: true });
+//   });
+
+//   // Export ZIP
 //   try {
 //     const blob = await zip.generateAsync({ type: "blob" });
 //     const url = URL.createObjectURL(blob);
@@ -1873,6 +1610,269 @@ async function exportRouteSummary() {
 //   resetApp();
 //   initMap();
 // }
+
+// For normal app route tracking
+async function exportRouteSummary() {
+  console.log("📦 Attempting route export...");
+
+  if (!routeData || !Array.isArray(routeData) || routeData.length === 0) {
+    alert("⚠️ No route data available to export. Please track or load a route first.");
+    return;
+  }
+
+  const hasLocation = routeData.some(entry => entry.type === "location");
+  if (!hasLocation) {
+    alert("⚠️ No location data found in this session.");
+    return;
+  }
+
+  const mostRecent = JSON.parse(localStorage.getItem("sessions") || "[]").slice(-1)[0];
+  const defaultName = mostRecent?.name || "My Route";
+  const name = prompt("Enter a title for this route summary:", defaultName);
+  if (!name) return;
+
+  const zip = new JSZip();
+  const notesFolder = zip.folder("notes");
+  const imagesFolder = zip.folder("images");
+  const audioFolder = zip.folder("audio");
+  const mediaForArchive = {};
+
+  let markersJS = "";
+  let pathCoords = [];
+  let enriched = [];
+  let noteCounter = 1;
+  let photoCounter = 1;
+  let audioCounter = 1;
+
+  for (const entry of routeData) {
+    if (entry.type === "location") {
+      pathCoords.push([entry.coords.lat, entry.coords.lng]);
+      enriched.push({ ...entry }); // clone for later enrichment
+    } else if (entry.type === "text") {
+      notesFolder.file(`note${noteCounter}.txt`, entry.content);
+      markersJS += `
+L.marker([${entry.coords.lat}, ${entry.coords.lng}], {
+  icon: L.divIcon({ className: 'custom-icon', html: '📝', iconSize: [24, 24] })
+})
+  .addTo(map)
+  .bindTooltip("Note ${noteCounter}")
+  .bindPopup("<b>Note ${noteCounter}</b><br><pre>${entry.content}</pre>");
+`;
+      noteCounter++;
+    } else if (entry.type === "photo") {
+      const base64Data = entry.content.split(",")[1];
+      imagesFolder.file(`photo${photoCounter}.jpg`, base64Data, { base64: true });
+      markersJS += `
+L.marker([${entry.coords.lat}, ${entry.coords.lng}], {
+  icon: L.divIcon({ className: 'custom-icon', html: '📸', iconSize: [24, 24] })
+})
+  .addTo(map)
+  .bindTooltip("Photo ${photoCounter}")
+  .bindPopup("<b>Photo ${photoCounter}</b><br><img src='images/photo${photoCounter}.jpg' style='width:200px'>");
+`;
+      photoCounter++;
+    } else if (entry.type === "audio") {
+      const base64Data = entry.content.split(",")[1];
+      audioFolder.file(`audio${audioCounter}.webm`, base64Data, { base64: true });
+      markersJS += `
+L.marker([${entry.coords.lat}, ${entry.coords.lng}])
+  .addTo(map)
+  .bindPopup("<b>Audio ${audioCounter}</b><br><audio controls src='audio/audio${audioCounter}.webm'></audio>");
+`;
+      audioCounter++;
+    }
+  }
+
+  // Enrich with elevation
+  for (const entry of enriched) {
+    if (entry.type === "location" && entry.elevation == null) {
+      entry.elevation = await getElevation(entry.coords.lat, entry.coords.lng);
+    }
+  }
+
+  // Accessibility computation
+  let accessibleLength = 0;
+  for (let i = 1; i < enriched.length; i++) {
+    const a = enriched[i - 1], b = enriched[i];
+    if (a.elevation != null && b.elevation != null) {
+      const dist = haversineDistance(a.coords, b.coords);
+      const elev = b.elevation - a.elevation;
+      const grade = (elev / (dist * 1000)) * 100;
+      if (Math.abs(grade) <= 6) accessibleLength += dist * 1000;
+    }
+  }
+
+  // Elevation chart PNG
+  const elevationCanvas = await generateElevationChartCanvas(enriched);
+  const base64Chart = elevationCanvas.toDataURL("image/png");
+  const elevationBlob = await new Promise(res => elevationCanvas.toBlob(res, "image/png"));
+  zip.file("elevation.png", elevationBlob);
+  mediaForArchive["elevation.png"] = base64Chart.split(",")[1];
+
+  // const accessibilityEntry = routeData.find(e => e.type === "accessibility");
+  // const accessibilityData = accessibilityEntry ? accessibilityEntry.content : null;
+  // const accessibilityJSON = JSON.stringify(accessibilityData);
+
+  const accessibilityData = JSON.parse(localStorage.getItem("accessibilityData") || "null");
+console.log(accessibilityData);
+  const boundsVar = JSON.stringify(pathCoords);
+
+  const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${name}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; }
+    #map { height: 60vh; }
+    #summaryPanel { padding: 20px; background: #f7f7f7; }
+    #routeTitle { font-size: 24px; margin-bottom: 10px; color: #2c3e50; }
+    .stats { margin-top: 10px; }
+    .stats b { display: inline-block; width: 120px; }
+    #description { margin-top: 20px; }
+    #description textarea { width: 100%; height: 100px; font-size: 14px; }
+    #accessibilityDetails ul { list-style-type: none; padding-left: 0; }
+    #accessibilityDetails li { margin-bottom: 5px; }
+  </style>
+</head>
+<body>
+<div id="summaryPanel">
+  <div id="routeTitle">📍 ${name}</div>
+  <div class="stats">
+    <div><b>Distance:</b> ${totalDistance.toFixed(2)} km</div>
+    <div><b>Time:</b> ${document.getElementById("timer").textContent}</div>
+    <div><b>Photos:</b> ${photoCounter - 1}</div>
+    <div><b>Notes:</b> ${noteCounter - 1}</div>
+    <div><b>Audios:</b> ${audioCounter - 1}</div>
+    <p><b>Accessible Length:</b> ${accessibleLength.toFixed(0)} m</p>
+  </div>
+  <div id="description">
+    <h4>General Description:</h4>
+    <textarea placeholder="Add notes or observations about the route here..."></textarea>
+    </div>
+  <div id="accessibilityDetailsContainer"></div>
+</div>
+
+<canvas id="chart" width="800" height="200">Chart Goes Here</canvas>
+
+<div style="margin-top: 10px;">
+  <b>Gradient Legend:</b><br>
+  <span style="color:green">🟩 ≤ 6% (Mild)</span>&nbsp;&nbsp;
+  <span style="color:orange">🟧 6–10% (Moderate)</span>&nbsp;&nbsp;
+  <span style="color:red">🟥 > 10% (Steep)</span>
+</div>
+
+<div id="map"></div>
+<script>
+var map = L.map('map');
+var bounds = L.latLngBounds(${boundsVar});
+map.fitBounds(bounds);
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  maxZoom: 18,
+  attribution: '&copy; OpenStreetMap contributors'
+}).addTo(map);
+
+L.polyline(${JSON.stringify(pathCoords)}, { color: 'blue' }).addTo(map);
+
+const route = ${JSON.stringify(enriched)};
+  const haversine = (a, b) => {
+    const toRad = x => x * Math.PI / 180, R = 6371;
+    const dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+    const lat1 = toRad(a.lat), lat2 = toRad(b.lat);
+    const a_ = Math.sin(dLat/2)**2 + Math.cos(lat1)*Math.cos(lat2)*Math.sin(dLng/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a_), Math.sqrt(1-a_));
+  };
+
+  for (let i = 1; i < route.length; i++) {
+    const a = route[i - 1], b = route[i];
+    const dist = haversine(a.coords, b.coords);
+    const elev = b.elevation - a.elevation;
+    const grade = (elev / (dist * 1000)) * 100;
+    const color = Math.abs(grade) > 10 ? 'red' : Math.abs(grade) > 6 ? 'orange' : 'green';
+    L.polyline([a.coords, b.coords], { color }).addTo(map);
+  }
+
+
+${markersJS}
+
+// Accessibility summary rendering
+(function(){
+  const data = ${JSON.stringify(accessibilityData)};
+  if (!data) return;
+  const html = \`
+    <div id="accessibilityDetails">
+      <h3>♿ Accessibility Details</h3>
+      <ul>
+        <li><b>Disabled Parking:</b> \${data.disabledParkingCount}</li>
+        <li><b>Path Type:</b> \${data.pathType}</li>
+        <li><b>Accessible Length:</b> \${data.accessibleLength} m</li>
+        <li><b>Route Type:</b> \${data.routeType}</li>
+        <li><b>Slope:</b> \${data.slope}</li>
+        <li><b>Points of Interest:</b> \${data.pointsOfInterest}</li>
+        <li><b>Lookouts:</b> \${data.lookouts ? "Yes" : "No"}</li>
+        <li><b>Picnic Spots:</b> \${data.picnicSpots ? "Yes" : "No"}</li>
+        <li><b>Accessible Toilets:</b> \${data.accessibleToilets ? "Yes" : "No"}</li>
+        <li><b>Benches:</b> \${data.benches ? "Yes" : "No"}</li>
+        <li><b>Shade:</b> \${data.shade}</li>
+      </ul>
+    </div>\`;
+  document.getElementById("accessibilityDetailsContainer").innerHTML = html;
+})();
+
+  new Chart(document.getElementById("chart"), {
+    type: "line",
+    data: {
+      labels: route.map((c, i) => i),
+      datasets: [{
+        label: "Elevation (m)",
+        data: route.map(c => c.elevation),
+        borderColor: "green",
+        tension: 0.3,
+        fill: true
+      }]
+    }
+  });
+
+</script>
+</body>
+</html>
+`;
+
+  //const mediaForArchive = {};
+  routeData.forEach((entry, i) => {
+    if (entry.type === "photo") {
+      const base64 = entry.content.split(",")[1];
+      mediaForArchive[`photo${i + 1}.jpg`] = base64;
+    } else if (entry.type === "text") {
+      mediaForArchive[`note${i + 1}.txt`] = entry.content;
+    }
+  });
+  SummaryArchive.saveToArchive(name, htmlContent, mediaForArchive);
+
+  zip.file("index.html", htmlContent);
+
+  try {
+    const blob = await zip.generateAsync({ type: "blob" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `route-summary-${Date.now()}.zip`;
+    a.click();
+    console.log("✅ Route summary exported successfully.");
+  } catch (e) {
+    console.error("❌ Export failed:", e);
+    alert("❌ Failed to export route summary.");
+  }
+
+  resetApp();
+  initMap();
+}
 
 
 async function exportAllRoutes() {
